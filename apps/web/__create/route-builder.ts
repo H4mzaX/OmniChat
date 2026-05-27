@@ -9,7 +9,7 @@ const API_BASENAME = '/api';
 const api = new Hono();
 
 // Get current directory
-const __dirname = join(fileURLToPath(new URL('.', import.meta.url)), '../src/app/api');
+const __dirname = join(process.cwd(), 'src/app/api');
 if (globalThis.fetch) {
   globalThis.fetch = updatedFetch;
 }

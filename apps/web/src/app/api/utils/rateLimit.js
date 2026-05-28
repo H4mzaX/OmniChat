@@ -3,13 +3,15 @@ import { tooMany } from "./response.js";
 const buckets = new Map();
 const CLEANUP_INTERVAL = 60000;
 
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, bucket] of buckets) {
-    bucket.items = bucket.items.filter((t) => now - t < bucket.windowMs);
-    if (bucket.items.length === 0) buckets.delete(key);
-  }
-}, CLEANUP_INTERVAL).unref();
+if (typeof globalThis.caches === 'undefined') {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [key, bucket] of buckets) {
+      bucket.items = bucket.items.filter((t) => now - t < bucket.windowMs);
+      if (bucket.items.length === 0) buckets.delete(key);
+    }
+  }, CLEANUP_INTERVAL).unref();
+}
 
 export function rateLimit({ windowMs = 60000, max = 60, keyFn } = {}) {
   return (request) => {

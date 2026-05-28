@@ -1,6 +1,6 @@
 import { getMediaInfo, transcribeAudio } from "../utils/ingestion/media.js";
-import { ok, badRequest, serverError } from "../utils/response";
-import { rateLimit } from "../utils/rateLimit";
+import { ok, badRequest, serverError } from "../utils/response.js";
+import { rateLimit } from "../utils/rateLimit.js";
 
 export async function POST(request) {
   const rl = rateLimit({ max: 5, windowMs: 60000 });

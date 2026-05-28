@@ -1,6 +1,6 @@
-import { ok, badRequest, serverError } from "../utils/response";
-import { rateLimit } from "../utils/rateLimit";
-import { logError } from "../utils/logger";
+import { ok, badRequest, serverError } from "../utils/response.js";
+import { rateLimit } from "../utils/rateLimit.js";
+import { logError } from "../utils/logger.js";
 
 const SANDBOX_IMAGES = {
   python: "python:3.12-alpine",

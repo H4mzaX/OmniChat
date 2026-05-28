@@ -1,4 +1,4 @@
-import { badRequest } from "./response";
+import { badRequest } from "./response.js";
 
 export function validate(body, schema) {
   const errors = {};

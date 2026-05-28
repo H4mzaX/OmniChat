@@ -1,5 +1,5 @@
-import sql from "../utils/sql";
-import { ok, serverError } from "../utils/response";
+import sql from "../utils/sql.js";
+import { ok, serverError } from "../utils/response.js";
 
 export async function GET() {
   try {

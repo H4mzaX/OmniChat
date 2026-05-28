@@ -1,7 +1,7 @@
 import { listArchive } from "../utils/ingestion/index.js";
 import { validateFile, validateArchive } from "../utils/ingestion/safety.js";
-import { ok, badRequest, serverError } from "../utils/response";
-import { rateLimit } from "../utils/rateLimit";
+import { ok, badRequest, serverError } from "../utils/response.js";
+import { rateLimit } from "../utils/rateLimit.js";
 
 export async function POST(request) {
   const rl = rateLimit({ max: 10, windowMs: 60000 });

@@ -1,4 +1,4 @@
-import { tooMany } from "./response";
+import { tooMany } from "./response.js";
 
 const buckets = new Map();
 const CLEANUP_INTERVAL = 60000;

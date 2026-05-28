@@ -1,6 +1,6 @@
 import { ingest, validateFile, detectMime } from "../utils/ingestion/index.js";
-import { ok, badRequest, serverError } from "../utils/response";
-import { rateLimit } from "../utils/rateLimit";
+import { ok, badRequest, serverError } from "../utils/response.js";
+import { rateLimit } from "../utils/rateLimit.js";
 
 const filesStore = new Map();
 let fileId = 0;

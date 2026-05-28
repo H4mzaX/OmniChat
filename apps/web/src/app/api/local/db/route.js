@@ -1,5 +1,5 @@
-import { ok, badRequest, serverError } from "../../utils/response";
-import { logError } from "../../utils/logger";
+import { ok, badRequest, serverError } from "../../utils/response.js";
+import { logError } from "../../utils/logger.js";
 
 export async function POST(request) {
   try {

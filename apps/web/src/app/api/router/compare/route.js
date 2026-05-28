@@ -1,4 +1,4 @@
-import sql from "@/app/api/utils/sql";
+import sql from "../../utils/sql.js";
 
 const PROVIDER_BASES = {
   openai: "https://api.openai.com",

@@ -1,6 +1,6 @@
 import { cloneRepo, indexRepo, analyzeRepo, findSymbols } from "../utils/ingestion/index.js";
-import { ok, badRequest, serverError } from "../utils/response";
-import { rateLimit } from "../utils/rateLimit";
+import { ok, badRequest, serverError } from "../utils/response.js";
+import { rateLimit } from "../utils/rateLimit.js";
 import fs from "fs";
 
 const repos = new Map();

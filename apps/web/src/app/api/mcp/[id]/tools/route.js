@@ -1,5 +1,5 @@
-import sql from "@/app/api/utils/sql";
-import { ok, notFound, serverError } from "@/app/api/utils/response";
+import sql from "../../../utils/sql.js";
+import { ok, notFound, serverError } from "../../../utils/response.js";
 
 export async function GET(request, { params }) {
   try {

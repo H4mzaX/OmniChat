@@ -1,8 +1,8 @@
 import { ingest, validateFile } from "../utils/ingestion/index.js";
 import { parsePdf, parseDocx, parseDoc } from "../utils/ingestion/parsers.js";
 import { ocrImage } from "../utils/ingestion/ocr.js";
-import { ok, badRequest, serverError } from "../utils/response";
-import { rateLimit } from "../utils/rateLimit";
+import { ok, badRequest, serverError } from "../utils/response.js";
+import { rateLimit } from "../utils/rateLimit.js";
 
 export async function POST(request) {
   const rl = rateLimit({ max: 20, windowMs: 60000 });

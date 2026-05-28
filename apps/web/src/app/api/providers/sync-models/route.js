@@ -1,4 +1,4 @@
-import sql from "@/app/api/utils/sql";
+import sql from "../../utils/sql.js";
 
 /* ─── OpenRouter model fetch ─────────────────────────────────
    Endpoint: GET https://openrouter.ai/api/v1/models

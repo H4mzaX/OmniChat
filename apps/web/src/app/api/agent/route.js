@@ -1,6 +1,6 @@
-import { ok, badRequest, serverError, methodNotAllowed } from "../utils/response";
-import { rateLimit } from "../utils/rateLimit";
-import { logError } from "../utils/logger";
+import { ok, badRequest, serverError, methodNotAllowed } from "../utils/response.js";
+import { rateLimit } from "../utils/rateLimit.js";
+import { logError } from "../utils/logger.js";
 
 const AGENTS = {
   code: { name: "Code Agent", desc: "Write and execute code in a sandbox" },

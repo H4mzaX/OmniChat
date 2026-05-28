@@ -59,10 +59,25 @@ for (const method of ['log', 'info', 'warn', 'error', 'debug'] as const) {
   };
 }
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+let pool = null;
+let realAdapter = null;
+
+function getRealAdapter() {
+  if (realAdapter) return realAdapter;
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error("DATABASE_URL environment variable is missing!");
+  }
+  pool = new Pool({ connectionString });
+  realAdapter = NeonAdapter(pool);
+  return realAdapter;
+}
+
+const adapter = new Proxy({} as any, {
+  get(target, prop, receiver) {
+    return Reflect.get(getRealAdapter(), prop, receiver);
+  }
 });
-const adapter = NeonAdapter(pool);
 
 const app = new Hono();
 

@@ -10,7 +10,7 @@ const { PermissionStatus } = Notifications;
 const scheduledNotifications = new Map<
   string,
   {
-    timeoutId: number;
+    timeoutId: any;
     request: NotificationRequest;
   }
 >();

@@ -2,7 +2,7 @@
   "version": 2,
   "outputDirectory": "build/client",
   "functions": {
-    "src/api/index.js": {
+    "api/index.js": {
       "includeFiles": "build/server/**,src/app/api/**"
     }
   },

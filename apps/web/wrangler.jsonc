@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "omnichat",
+  "main": "build/server/index.js",
+  "compatibility_date": "2026-05-28",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "assets": {
+    "directory": "build/client"
+  },
+  "observability": {
+    "enabled": true
+  }
+}

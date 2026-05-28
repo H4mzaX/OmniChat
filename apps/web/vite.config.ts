@@ -40,7 +40,7 @@ export default defineConfig({
     restartEnvFileChange(),
     reactRouterHonoServer({
       serverEntryPoint: './__create/index.ts',
-      runtime: 'node',
+      runtime: (process.env.CF_PAGES === '1' || !!process.env.CLOUDFLARE || !!process.env.WRANGLER) ? 'cloudflare' : 'node',
     }),
     babel({
       include: ['src/**/*.{js,jsx,ts,tsx}'],

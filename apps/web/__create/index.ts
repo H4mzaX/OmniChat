@@ -4,21 +4,45 @@ import { skipCSRFCheck } from '@auth/core';
 import Credentials from '@auth/core/providers/credentials';
 import { authHandler, initAuthConfig } from '@hono/auth-js';
 import { Pool, neonConfig } from '@neondatabase/serverless';
-import { hash, verify } from 'argon2';
 import { Hono } from 'hono';
 import { contextStorage, getContext } from 'hono/context-storage';
 import { cors } from 'hono/cors';
 import { proxy } from 'hono/proxy';
 import { bodyLimit } from 'hono/body-limit';
 import { requestId } from 'hono/request-id';
-import { createHonoServer } from 'react-router-hono-server/node';
 import { serializeError } from 'serialize-error';
-import ws from 'ws';
 import NeonAdapter from './adapter';
 import { getHTMLForErrorPage } from './get-html-for-error-page';
 import { isAuthAction } from './is-auth-action';
 import { API_BASENAME, api } from './route-builder';
-neonConfig.webSocketConstructor = ws;
+
+const isCloudflare = typeof globalThis.caches !== 'undefined';
+
+const { createHonoServer } = isCloudflare
+  ? await import('react-router-hono-server/cloudflare')
+  : await import('react-router-hono-server/node');
+
+if (!isCloudflare) {
+  const ws = (await import('ws')).default;
+  neonConfig.webSocketConstructor = ws;
+}
+
+let hash: (password: string) => Promise<string>;
+let verify: (hash: string, plain: string) => Promise<boolean>;
+
+if (isCloudflare) {
+  hash = async () => {
+    throw new Error("Argon2 hashing is not supported on Cloudflare Workers native runtime. Please deploy to Vercel/Node to use credentials sign-up.");
+  };
+  verify = async () => {
+    throw new Error("Argon2 verification is not supported on Cloudflare Workers native runtime. Please deploy to Vercel/Node to use credentials sign-in.");
+  };
+} else {
+  const argon2 = await import('argon2');
+  hash = argon2.hash;
+  verify = argon2.verify;
+}
+
 
 const als = new AsyncLocalStorage<{ requestId: string }>();
 

@@ -6,4 +6,9 @@
   input, textarea, select, button {
     @apply outline-none focus:outline-none;
   }
+
+  /* Ensure buttons and inputs inherit color from parent in both themes */
+  button, a, input, textarea, select {
+    color: inherit;
+  }
 }

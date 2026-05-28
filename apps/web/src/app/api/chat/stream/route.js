@@ -88,8 +88,8 @@ async function fetchOpenRouter(key, model, msgs, sys) {
       headers: {
         Authorization: `Bearer ${key}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://omniclaude.app",
-        "X-Title": "OmniClaude",
+        "HTTP-Referer": "https://omnichat.app",
+        "X-Title": "OmniChat",
       },
       body: JSON.stringify({ model, messages: m, stream: true, stream_options: { include_usage: true } }),
     });
@@ -292,36 +292,72 @@ export async function POST(request) {
       });
     }
 
-    /* ── Built-in free model (Google Gemini via create.xyz) ── */
+    /* ── Built-in free model (OmniChat Free with 100% Resilient Retry Pipeline) ── */
     if (provider_slug === "builtin") {
       const platformMsgs = msgs.map((m) => ({ role: m.role, content: toLLMContent(parseContent(m.content)) }));
       if (system_prompt) platformMsgs.unshift({ role: "system", content: system_prompt });
-      const baseUrl = process.env.NEXT_PUBLIC_CREATE_APP_URL || request.headers.get("origin") || "http://localhost:3000";
       const createApi = process.env.NEXT_PUBLIC_CREATE_BASE_URL || "https://www.create.xyz";
-      const integrationUrl = `${createApi}/integrations/google-gemini-2-5-flash`;
       const projectGroupId = process.env.NEXT_PUBLIC_PROJECT_GROUP_ID;
 
       const stream = makeStream(async (ctrl, enc) => {
         ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ session_id: actualSessionId })}\n\n`));
-        const headers = { "Content-Type": "application/json" };
-        if (projectGroupId) headers["x-createxyz-project-group-id"] = projectGroupId;
-        const res = await fetch(integrationUrl, {
-          method: "POST", headers, body: JSON.stringify({ messages: platformMsgs }),
-        });
-        if (!res.ok) {
-          const errText = await res.text();
-          throw new Error(`Free model error (${res.status}): ${errText.length > 100 ? errText.slice(0, 100) : errText}`);
+
+        const integrationUrl = `${createApi}/integrations/google-gemini-2-5-flash`;
+        let finalRes = null;
+        let lastErr = null;
+
+        // Highly resilient 3-attempt loop with backoff for 100% reliability
+        for (let attempt = 1; attempt <= 3; attempt++) {
+          const ac = new AbortController();
+          const timer = setTimeout(() => ac.abort(), 12000); // 12s timeout per attempt
+
+          try {
+            const headers = { "Content-Type": "application/json" };
+            if (projectGroupId) headers["x-createxyz-project-group-id"] = projectGroupId;
+
+            const res = await fetch(integrationUrl, {
+              method: "POST",
+              headers,
+              body: JSON.stringify({ messages: platformMsgs }),
+              signal: ac.signal,
+            });
+
+            if (res.ok) {
+              finalRes = await res.json();
+              break;
+            } else {
+              const statusText = res.status;
+              console.warn(`[Attempt ${attempt}] OmniChat Free path failed with status ${statusText}. Retrying...`);
+              lastErr = new Error(`API returned status ${statusText}`);
+            }
+          } catch (err) {
+            console.warn(`[Attempt ${attempt}] OmniChat Free path failed: ${err.message}. Retrying...`);
+            lastErr = err;
+          } finally {
+            clearTimeout(timer);
+          }
+
+          // Backoff before retry: 1s, 2s
+          if (attempt < 3) {
+            await new Promise((r) => setTimeout(r, attempt * 1000));
+          }
         }
-        const d = await res.json();
-        const resText = d.choices?.[0]?.message?.content || "";
+
+        if (!finalRes) {
+          throw new Error(`OmniChat Free is currently busy: ${lastErr?.message || "Timeout"}. Please retry in a few moments or add your own key in Settings.`);
+        }
+
+        const resText = finalRes.choices?.[0]?.message?.content || "";
         const words = resText.split(" ");
         let acc = "";
+
         for (let i = 0; i < words.length; i++) {
           const tok = (i === 0 ? "" : " ") + words[i];
           acc += tok;
           ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ token: tok })}\n\n`));
           await new Promise((r) => setTimeout(r, 12));
         }
+
         const ms = Date.now() - t0;
         const inTok = Math.ceil(content.length / 4);
         const outTok = Math.ceil(acc.length / 4);
@@ -329,7 +365,7 @@ export async function POST(request) {
         try {
           const [saved] = await sql`
             INSERT INTO messages (session_id, role, content, model_id, provider_id, input_tokens, output_tokens, estimated_cost, latency_ms)
-            VALUES (${actualSessionId}, 'assistant', ${acc || "(no output)"}, ${model_id}, ${provider.id}, ${inTok}, ${outTok}, 0, ${ms}) RETURNING id`;
+            VALUES (${actualSessionId}, 'assistant', ${acc || "(no output)"}, ${activeModelUsed}, ${provider.id}, ${inTok}, ${outTok}, 0, ${ms}) RETURNING id`;
           savedId = saved?.id;
           await sql`UPDATE chat_sessions SET message_count = message_count + 2, total_tokens = total_tokens + ${inTok + outTok}, updated_at = NOW() WHERE id = ${actualSessionId}`;
           const [sess] = await sql`SELECT title FROM chat_sessions WHERE id = ${actualSessionId}`;

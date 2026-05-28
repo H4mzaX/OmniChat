@@ -10,7 +10,9 @@ export async function getLocalDb() {
   }
 
   // Try loading from localStorage
-  const saved = typeof window !== "undefined" ? localStorage.getItem("omniclaude_local_db") : null;
+  const saved = typeof window !== "undefined"
+    ? (localStorage.getItem("omnichat_local_db") || localStorage.getItem("omniclaude_local_db"))
+    : null;
   if (saved) {
     const buffer = Buffer.from(saved, "base64");
     db = new initSQL.Database(buffer);
@@ -51,7 +53,7 @@ export function persistLocalDb() {
   const data = db.export();
   const buffer = Buffer.from(data);
   if (typeof window !== "undefined") {
-    localStorage.setItem("omniclaude_local_db", buffer.toString("base64"));
+    localStorage.setItem("omnichat_local_db", buffer.toString("base64"));
   }
 }
 

@@ -14,10 +14,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" style={{ height: "100%" }}>
       <head>
-        <title>OmniClaude — Universal AI Workspace</title>
+        <title>OmniChat — Universal AI Workspace</title>
         <meta
           name="description"
-          content="Claude-grade desktop UX with universal model access. BYOK."
+          content="Premium AI workspace with universal model access. BYOK."
         />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link

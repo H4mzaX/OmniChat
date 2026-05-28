@@ -49,8 +49,8 @@ async function callProvider(provider, apiKey, modelId, messages) {
         headers: {
           Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
-          "HTTP-Referer": "https://omniclaude.app",
-          "X-Title": "OmniClaude",
+          "HTTP-Referer": "https://omnichat.app",
+          "X-Title": "OmniChat",
         },
         body: JSON.stringify({ model: modelId, messages: msgs }),
         signal: AbortSignal.timeout(30000),

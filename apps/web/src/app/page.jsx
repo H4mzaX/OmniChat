@@ -6,7 +6,7 @@ import ChatWorkspace from "../components/ChatWorkspace";
 import SettingsModal from "../components/SettingsModal";
 import CompareView from "../components/CompareView";
 
-/* ─── Claude.ai–faithful global tokens ──────────────────────── */
+/* ─── Claude.ai–faithful global tokens + Premium Obsidian Dark Mode ──────────────────────── */
 const GLOBAL_CSS = `
   :root {
     --font:       'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
@@ -14,11 +14,9 @@ const GLOBAL_CSS = `
     --font-mono:  "SF Mono","Fira Code",Menlo,monospace;
     --font-family-primary: var(--font);
 
-    /* Palette — Claude.ai faithful (2026 design tokens) */
+    /* Palette — Light Mode (Warm Sand & Cream) */
     --bg:            #f9f9f6;
-
     --bg-sidebar:    #f3f3ee;
-
     --bg-card:       #ffffff;
     --bg-hover:      rgba(20,20,19,0.04);
     --bg-active:     rgba(20,20,19,0.07);
@@ -96,6 +94,75 @@ const GLOBAL_CSS = `
     --font-size-xs:12px; --font-size-sm:14px; --font-size-md:16px;
     --font-weight-base:400; --font-weight-medium:500; --font-weight-semibold:600;
     --line-height-base:20px; --line-height-body:1.7;
+    --msg-pad-x: 24px;
+  }
+
+  /* ─── Premium Obsidian Dark Mode Overrides ─── */
+  :root[data-theme="dark"] {
+    --bg:            #0c0c0b; /* deep elegant warm obsidian black */
+    --bg-sidebar:    #121210; /* obsidian sidebar */
+    --bg-card:       #181816; /* warm dark card layers */
+    --bg-hover:      rgba(240,240,235,0.06);
+    --bg-active:     rgba(240,240,235,0.09);
+    --bg-user-bubble: #22221f;
+
+    --border:        rgba(235,230,215,0.08);
+    --border-md:     rgba(235,230,215,0.13);
+    --border-strong: rgba(235,230,215,0.22);
+
+    --t1: #f2f2eb;   /* premium soft gold-white ink */
+    --t2: #d3d2c8;   /* warm grey secondary text */
+    --t3: #9b9a91;   /* muted tertiary text */
+    --t4: #6a6962;   /* placeholder text */
+
+    --accent:       #e28a6c; /* readibility-enhanced warm coral */
+    --accent-hov:   #cc785c;
+    --accent-light: rgba(226,138,108,0.12);
+
+    --send-bg:      #f2f2eb;
+    --send-hov:     #d3d2c8;
+
+    --sh-xs: 0 1px 2px rgba(0,0,0,0.45);
+    --sh-sm: 0 1px 3px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.02);
+    --sh-md: 0 4px 12px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.03);
+    --sh-lg: 0 12px 28px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.04);
+    --sh-xl: 0 24px 56px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.05);
+    --sh-composer: 0 -2px 20px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03);
+  }
+
+  /* ─── Layout Density Modifiers ─── */
+  :root[data-density="compact"] {
+    --msg-pad-x: 12px;
+    --s5: 8px;
+    --s6: 10px;
+    --s7: 16px;
+    --r2: 6px;
+    --r3: 8px;
+    --r4: 12px;
+    --line-height-body: 1.5;
+  }
+  :root[data-density="spacious"] {
+    --msg-pad-x: 36px;
+    --s5: 16px;
+    --s6: 24px;
+    --s7: 32px;
+    --r3: 16px;
+    --r4: 22px;
+    --line-height-body: 1.85;
+  }
+
+  /* ─── Font Size Modifiers ─── */
+  :root[data-font-size="small"] {
+    font-size: 13.5px;
+    --font-size-xs: 11px;
+    --font-size-sm: 12px;
+    --font-size-md: 14.5px;
+  }
+  :root[data-font-size="large"] {
+    font-size: 16.5px;
+    --font-size-xs: 13px;
+    --font-size-sm: 15px;
+    --font-size-md: 18px;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -107,20 +174,35 @@ const GLOBAL_CSS = `
     font-size: 15px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background-color 200ms ease, color 200ms ease;
   }
   :focus { outline: none; }
   :focus-visible { outline: 2px solid var(--info); outline-offset: 2px; border-radius: var(--r2); }
 
-  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: rgba(20,20,19,0.12); border-radius: var(--rf); }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(20,20,19,0.20); }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(20,20,19,0.22); }
+
+  :root[data-theme="dark"] ::-webkit-scrollbar-thumb { background: rgba(240,240,235,0.14); }
+  :root[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: rgba(240,240,235,0.25); }
+
+  /* Premium Glassmorphic utilities */
+  .oc-glass {
+    backdrop-filter: blur(12px) saturate(120%);
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(120, 100, 75, 0.08);
+  }
+  :root[data-theme="dark"] .oc-glass {
+    background: rgba(24, 24, 22, 0.65);
+    border: 1px solid rgba(235, 230, 215, 0.07);
+  }
 
   @keyframes oc-blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
   @keyframes oc-dot { 0%,60%,100%{transform:translateY(0);opacity:.3} 30%{transform:translateY(-4px);opacity:1} }
   @keyframes oc-fadein { from{opacity:0} to{opacity:1} }
-  @keyframes oc-slideup { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes oc-card-in { from{opacity:0;transform:scale(0.85) translateY(12px)} to{opacity:1;transform:scale(1) translateY(0)} }
+  @keyframes oc-slideup { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes oc-card-in { from{opacity:0;transform:scale(0.96) translateY(8px)} to{opacity:1;transform:scale(1) translateY(0)} }
   @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
 
   .oc-cursor {
@@ -135,30 +217,43 @@ const GLOBAL_CSS = `
     animation:oc-dot 1.4s ease-in-out infinite;
   }
 
+  /* Form elements legibility fixes for dark mode */
+  :root[data-theme="dark"] select,
+  :root[data-theme="dark"] option,
+  :root[data-theme="dark"] input,
+  :root[data-theme="dark"] textarea {
+    background-color: var(--bg-card) !important;
+    color: var(--t1) !important;
+    border-color: var(--border-md) !important;
+  }
+  :root[data-theme="dark"] input::placeholder,
+  :root[data-theme="dark"] textarea::placeholder {
+    color: var(--t4) !important;
+  }
+
   /* Prose / markdown output */
   .oc-prose { font-family: var(--font-serif); font-size:15.5px; line-height:1.68; color:var(--t2); }
   .oc-prose p { margin-bottom:10px; }
   .oc-prose p:last-child { margin-bottom:0; }
-  .oc-prose h1 { font-size:20px; font-weight:600; color:var(--t1); margin:18px 0 10px; }
-  .oc-prose h2 { font-size:17px; font-weight:600; color:var(--t1); margin:16px 0 8px; }
-  .oc-prose h3 { font-size:15px; font-weight:600; color:var(--t1); margin:14px 0 6px; }
+  .oc-prose h1 { font-size:21px; font-weight:600; color:var(--t1); margin:18px 0 10px; font-family: var(--font); }
+  .oc-prose h2 { font-size:18px; font-weight:600; color:var(--t1); margin:16px 0 8px; font-family: var(--font); }
+  .oc-prose h3 { font-size:15.5px; font-weight:600; color:var(--t1); margin:14px 0 6px; font-family: var(--font); }
   .oc-prose ul,.oc-prose ol { padding-left:22px; margin-bottom:10px; }
   .oc-prose li { margin-bottom:3px; }
   .oc-prose code { font-family:var(--font-mono); font-size:12.5px; background:rgba(20,20,19,0.06); color:var(--t1); padding:2px 6px; border-radius:var(--r1); }
+  :root[data-theme="dark"] .oc-prose code { background:rgba(255,255,255,0.07); }
   .oc-prose pre { margin:10px 0; border-radius:var(--r2); overflow:hidden; }
   .oc-prose pre code { background:none; padding:0; font-size:13px; color:inherit; }
   .oc-prose blockquote { border-left:3px solid var(--border-md); padding-left:16px; color:var(--t3); margin:10px 0; font-style:italic; }
   .oc-prose table { width:100%; border-collapse:collapse; margin:10px 0; font-size:13px; }
   .oc-prose th { background:rgba(20,20,19,0.04); font-weight:600; color:var(--t1); padding:6px 12px; text-align:left; border-bottom:1px solid var(--border); }
+  :root[data-theme="dark"] .oc-prose th { background:rgba(255,255,255,0.04); }
   .oc-prose td { padding:6px 12px; border-bottom:1px solid var(--border); color:var(--t2); }
   .oc-prose a { color:var(--accent); text-decoration:underline; text-underline-offset:2px; }
   .oc-prose strong { font-weight:600; color:var(--t1); }
   .oc-prose em { font-style:italic; }
   .oc-prose hr { border:none; border-top:1px solid var(--border); margin:14px 0; }
 
-  :root {
-    --msg-pad-x: 24px;
-  }
   @media (max-width: 768px) {
     :root {
       --msg-pad-x: 12px;
@@ -174,6 +269,56 @@ export default function AppShell() {
   const [compareOpen, setCompareOpen] = useState(false);
   const [selectedModel, setSelectedModel] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Core Appearance States
+  const [theme, setTheme] = useState("system");
+  const [density, setDensity] = useState("comfortable");
+  const [fontSize, setFontSize] = useState("default");
+
+  // Load preferences from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedTheme = localStorage.getItem("omnichat-theme") || "system";
+      const storedDensity = localStorage.getItem("omnichat-density") || "comfortable";
+      const storedFontSize = localStorage.getItem("omnichat-font-size") || "default";
+      setTheme(storedTheme);
+      setDensity(storedDensity);
+      setFontSize(storedFontSize);
+    }
+  }, []);
+
+  // Sync theme changes with DOM attributes + media queries
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem("omnichat-theme", theme);
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+
+    const applyTheme = () => {
+      const actual = theme === "system" ? (media.matches ? "dark" : "light") : theme;
+      document.documentElement.setAttribute("data-theme", actual);
+    };
+
+    applyTheme();
+
+    if (theme === "system") {
+      media.addEventListener("change", applyTheme);
+      return () => media.removeEventListener("change", applyTheme);
+    }
+  }, [theme]);
+
+  // Sync density changes
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem("omnichat-density", density);
+    document.documentElement.setAttribute("data-density", density);
+  }, [density]);
+
+  // Sync font size changes
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem("omnichat-font-size", fontSize);
+    document.documentElement.setAttribute("data-font-size", fontSize);
+  }, [fontSize]);
 
   // Handle mobile screen resize
   useEffect(() => {
@@ -294,10 +439,10 @@ export default function AppShell() {
     if (!selectedModel && modelsData?.models?.length > 0) {
       const defId = settingsData?.settings?.default_model;
       const byId = defId
-        ? modelsData.models.find((m) => m.model_id === defId)
-        : null;
+          ? modelsData.models.find((m) => m.model_id === defId)
+          : null;
       const connNonBuiltin = modelsData.models.find(
-        (m) => m.is_connected && m.provider_slug !== "builtin",
+          (m) => m.is_connected && m.provider_slug !== "builtin",
       );
       const conn = modelsData.models.find((m) => m.is_connected);
       setSelectedModel(byId || connNonBuiltin || conn || modelsData.models[0]);
@@ -328,8 +473,8 @@ export default function AppShell() {
             style={{
               position: "absolute",
               inset: 0,
-              background: "rgba(0,0,0,0.3)",
-              backdropFilter: "blur(2px)",
+              background: "rgba(0,0,0,0.4)",
+              backdropFilter: "blur(3px)",
               zIndex: 40,
               animation: "oc-fadein 200ms ease",
             }}
@@ -350,7 +495,7 @@ export default function AppShell() {
             display: isMobile && sidebarCollapsed ? "none" : "flex",
             height: "100%",
             background: "var(--bg-sidebar)",
-            boxShadow: isMobile && !sidebarCollapsed ? "4px 0 24px rgba(20,20,19,0.15)" : "none",
+            boxShadow: isMobile && !sidebarCollapsed ? "4px 0 24px rgba(0,0,0,0.2)" : "none",
           }}
         >
           <Sidebar
@@ -376,6 +521,8 @@ export default function AppShell() {
             compareOpen={compareOpen}
             collapsed={isMobile ? false : sidebarCollapsed}
             onToggleCollapse={() => setSidebarCollapsed((v) => !v)}
+            theme={theme}
+            setTheme={setTheme}
           />
         </div>
 
@@ -392,6 +539,7 @@ export default function AppShell() {
           {/* Mobile top header bar */}
           {isMobile && (
             <div
+              className="oc-glass"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -399,8 +547,6 @@ export default function AppShell() {
                 height: 52,
                 padding: "0 16px",
                 borderBottom: "1px solid var(--border)",
-                background: "rgba(249, 249, 246, 0.95)",
-                backdropFilter: "blur(8px)",
                 flexShrink: 0,
                 zIndex: 10,
               }}
@@ -430,12 +576,13 @@ export default function AppShell() {
               <span
                 style={{
                   fontSize: 16.5,
-                  fontWeight: 500,
-                  fontFamily: "'Newsreader', Georgia, serif",
+                  fontWeight: 600,
+                  fontFamily: "var(--font)",
+                  letterSpacing: "-0.02em",
                   color: "var(--t1)",
                 }}
               >
-                Claude
+                OmniChat
               </span>
 
               <button
@@ -482,6 +629,12 @@ export default function AppShell() {
           <SettingsModal
             initialTab={settingsTab}
             onClose={() => setSettingsOpen(false)}
+            theme={theme}
+            setTheme={setTheme}
+            density={density}
+            setDensity={setDensity}
+            fontSize={fontSize}
+            setFontSize={setFontSize}
           />
         )}
       </div>

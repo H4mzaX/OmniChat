@@ -6,6 +6,28 @@ export async function GET(request) {
     const providerSlug = searchParams.get("provider");
     const connectedOnly = searchParams.get("connected") === "true";
 
+    // Ensure the single "Free Models" entry exists and disable individual free models
+    try {
+      const [builtinProvider] = await sql`SELECT id FROM providers WHERE slug = 'builtin' LIMIT 1`;
+      if (builtinProvider) {
+        // Disable old individual free models to hide them
+        await sql`
+          UPDATE models
+          SET is_enabled = false
+          WHERE provider_id = ${builtinProvider.id} AND model_id != 'free-models'
+        `;
+
+        // Insert/enable the single "OmniChat Free" entry
+        await sql`
+          INSERT INTO models (provider_id, model_id, display_name, context_window, input_cost_per_1k, output_cost_per_1k, supports_vision, is_enabled)
+          VALUES (${builtinProvider.id}, 'free-models', 'OmniChat Free', 1048576, 0, 0, true, true)
+          ON CONFLICT (provider_id, model_id) DO UPDATE SET display_name = 'OmniChat Free', is_enabled = true
+        `;
+      }
+    } catch (seedErr) {
+      console.error("Failed to seed free models:", seedErr);
+    }
+
     let models;
     if (providerSlug) {
       models = await sql`

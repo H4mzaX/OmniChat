@@ -21,7 +21,7 @@ export async function GET(request) {
     if (format === "markdown") {
       const lines = [`# ${session.title}`, `*Exported ${new Date().toISOString()}*\n`];
       for (const msg of messages) {
-        const role = msg.role === "user" ? "**You**" : "**Claude**";
+        const role = msg.role === "user" ? "**You**" : "**Assistant**";
         lines.push(`\n---\n\n${role}:\n\n${msg.content}\n`);
       }
       return new Response(lines.join("\n"), {

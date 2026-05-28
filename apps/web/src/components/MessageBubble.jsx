@@ -288,7 +288,7 @@ function FileBlock({ file }) {
         alignItems: "center",
         gap: 12,
         padding: "10px 14px",
-        background: "rgba(0,0,0,0.02)",
+        background: "var(--bg-active)",
         border: "1px solid var(--border)",
         borderRadius: 10,
         margin: "6px 0",
@@ -411,8 +411,8 @@ function Prose({ content }) {
   );
 }
 
-/* ── Claude logo SVG ─────────────────────────────────────────── */
-function ClaudeAvatar() {
+/* ── Omni brand avatar ───────────────────────────────────────── */
+function OmniAvatar() {
   const size = 28;
   return (
     <div
@@ -421,18 +421,18 @@ function ClaudeAvatar() {
         height: size,
         borderRadius: "50%",
         flexShrink: 0,
-        background: "var(--accent)",
+        background: "var(--accent-light)",
+        border: "1.5px solid var(--accent)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        boxShadow: "var(--sh-xs)",
       }}
     >
-      <svg height={Math.round(size * 0.6)} viewBox="0 0 24 24" width={Math.round(size * 0.6)} xmlns="http://www.w3.org/2000/svg">
-        <path
-          d="M4.709 15.955l4.72-2.647.08-.23-.08-.128H9.2l-.79-.048-2.698-.073-2.339-.097-2.266-.122-.571-.121L0 11.784l.055-.352.48-.321.686.06 1.52.103 2.278.158 1.652.097 2.449.255h.389l.055-.157-.134-.098-.103-.097-2.358-1.596-2.552-1.688-1.336-.972-.724-.491-.364-.462-.158-1.008.656-.722.881.06.225.061.893.686 1.908 1.476 2.491 1.833.365.304.145-.103.019-.073-.164-.274-1.355-2.446-1.446-2.49-.644-1.032-.17-.619a2.97 2.97 0 0 1-.104-.729L6.283.134 6.696 0l.996.134.42.364.62 1.414 1.002 2.229 1.555 3.03.456.898.243.832.091.255h.158V9.01l.128-1.706.237-2.095.23-2.695.08-.76.376-.91.747-.492.584.28.48.685-.067.444-.286 1.851-.559 2.903-.364 1.942h.212l.243-.242.985-1.306 1.652-2.064.73-.82.85-.904.547-.431h1.033l.76 1.129-.34 1.166-1.064 1.347-.881 1.142-1.264 1.7-.79 1.36.073.11.188-.02 2.856-.606 1.543-.28 1.841-.315.833.388.091.395-.328.807-1.969.486-2.309.462-3.439.813-.042.03.049.061 1.549.146.662.036h1.622l3.02.225.79.522.474.638-.079.485-1.215.62-1.64-.389-3.829-.91-1.312-.329h-.182v.11l1.093 1.068 2.006 1.81 2.509 2.33.127.578-.322.455-.34-.049-2.205-1.657-.851-.747-1.926-1.62h-.128v.17l.444.649 2.345 3.521.122 1.08-.17.353-.608.213-.668-.122-1.374-1.925-1.415-2.167-1.143-1.943-.14.08-.674 7.254-.316.37-.729.28-.607-.461-.322-.747.322-1.476.389-1.924.315-1.53.286-1.9.17-.632-.012-.042-.14.018-1.434 1.967-2.18 2.945-1.726 1.845-.414.164-.717-.37.067-.662.401-.589 2.388-3.036 1.44-1.882.93-1.086-.006-.158h-.055L4.132 18.56l-1.13.146-.487-.456.061-.746.231-.243 1.908-1.312-.006.006z"
-          fill="#fff"
-          fillRule="nonzero"
-        />
+      <svg width={Math.round(size * 0.55)} height={Math.round(size * 0.55)} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" />
+        <path d="M12 6C8.69 6 6 8.69 6 12C6 15.31 8.69 18 12 18C15.31 18 18 15.31 18 12" stroke="var(--accent)" strokeWidth="1.5" strokeDasharray="3 3" />
+        <path d="M12 8L13.5 10.5L16 12L13.5 13.5L12 16L10.5 13.5L8 12L10.5 10.5L12 8Z" fill="var(--accent)" />
       </svg>
     </div>
   );
@@ -481,7 +481,7 @@ function Chip({ label, value }) {
         gap: 4,
         fontSize: 11,
         color: "var(--t4)",
-        background: "rgba(0,0,0,0.05)",
+        background: "var(--bg-active)",
         borderRadius: "var(--rf)",
         padding: "2px 8px",
       }}
@@ -585,7 +585,7 @@ export default function MessageBubble({
             alignItems: "flex-start",
           }}
         >
-          <ClaudeAvatar />
+          <OmniAvatar />
           <div style={{ flex: 1, minWidth: 0 }}>
             {/* Header */}
             <div
@@ -599,14 +599,14 @@ export default function MessageBubble({
               <span
                 style={{ fontSize: 12.5, fontWeight: 500, color: "var(--t2)" }}
               >
-                Claude
+                OmniChat
               </span>
               {message.model_id && (
                 <span
                   style={{
                     fontSize: 11,
                     color: "var(--t4)",
-                    background: "rgba(0,0,0,0.04)",
+                    background: "var(--bg-active)",
                     borderRadius: 4,
                     padding: "1px 6px",
                   }}
@@ -623,42 +623,64 @@ export default function MessageBubble({
 
             {/* Reasoning / thinking toggle */}
             {reasoning && (
-              <div style={{ marginBottom: 6 }}>
+              <div style={{ marginBottom: 8, animation: "oc-fadein 200ms ease" }}>
                 <button
                   onClick={() => setShowReasoning((v) => !v)}
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
-                    gap: 5,
+                    gap: 6,
                     fontSize: 12,
                     color: "var(--t3)",
-                    background: "none",
-                    border: "none",
-                    borderRadius: 4,
-                    padding: "3px 8px",
+                    background: "var(--bg-hover)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 6,
+                    padding: "4px 10px",
                     cursor: "pointer",
                     fontFamily: "var(--font)",
+                    fontWeight: 500,
+                    transition: "all 120ms ease",
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = "var(--bg-hover)"}
-                  onMouseLeave={(e) => e.currentTarget.style.background = "none"}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = "var(--accent)";
+                    e.currentTarget.style.color = "var(--accent)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "var(--border)";
+                    e.currentTarget.style.color = "var(--t3)";
+                  }}
                 >
-                  <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
-                    <path d="M12 2a10 10 0 1010 10M12 2v4M12 2l3 3M12 2l-3 3" />
+                  <svg
+                    width={10}
+                    height={10}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={3}
+                    style={{
+                      transform: showReasoning ? "rotate(90deg)" : "none",
+                      transition: "transform 150ms ease",
+                    }}
+                  >
+                    <polyline points="9 18 15 12 9 6" />
                   </svg>
-                  {showReasoning ? "Hide reasoning" : "Show reasoning"}
+                  {showReasoning ? "Hide thought process" : "View thought process"}
                 </button>
                 {showReasoning && (
                   <div
                     style={{
-                      marginTop: 6,
-                      padding: "10px 14px",
+                      marginTop: 8,
+                      padding: "12px 16px",
                       background: "var(--bg-sidebar)",
-                      borderRadius: 8,
+                      borderLeft: "3px solid var(--accent)",
+                      borderRadius: "0 8px 8px 0",
                       fontSize: 13,
                       color: "var(--t3)",
-                      fontStyle: "italic",
                       lineHeight: 1.55,
                       whiteSpace: "pre-wrap",
+                      fontFamily: "var(--font-serif)",
+                      fontStyle: "italic",
+                      animation: "oc-slideup 200ms var(--ease)",
                     }}
                   >
                     {reasoning}

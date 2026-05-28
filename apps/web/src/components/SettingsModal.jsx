@@ -58,7 +58,7 @@ const TABS = [
   { id: "profile", label: "Profile" },
   { id: "appearance", label: "Appearance" },
   { id: "privacy", label: "Privacy & Safety" },
-  { id: "assistant", label: "Claude" },
+  { id: "assistant", label: "Assistant" },
   { id: "apikeys", label: "API Keys", badge: "BYOK" },
   { id: "models", label: "Models" },
   { id: "mcp", label: "MCP Servers" },
@@ -79,13 +79,13 @@ function Btn({
   const bg =
     variant === "primary"
       ? disabled
-        ? "rgba(0,0,0,0.1)"
+        ? "var(--bg-active)"
         : hov
           ? S.warn
           : S.accent
       : hov
-        ? "rgba(0,0,0,0.07)"
-        : "rgba(0,0,0,0.04)";
+        ? "var(--bg-active)"
+        : "var(--bg-hover)";
   const color = variant === "primary" ? (disabled ? S.t4 : "#fff") : S.t2;
   return (
     <button
@@ -155,7 +155,7 @@ function Toggle({ value, onChange }) {
         cursor: "pointer",
         position: "relative",
         flexShrink: 0,
-        background: value ? S.accent : "rgba(0,0,0,0.15)",
+        background: value ? S.accent : "var(--border-strong)",
         transition: "background 150ms",
       }}
     >
@@ -332,10 +332,7 @@ function ProfileTab() {
 }
 
 /* ── Appearance ── */
-function AppearanceTab() {
-  const [theme, setTheme] = useState("system");
-  const [density, setDensity] = useState("comfortable");
-  const [fontSize, setFontSize] = useState("default");
+function AppearanceTab({ theme, setTheme, density, setDensity, fontSize, setFontSize }) {
 
   const ThemeCard = ({ id, label, desc }) => (
     <div
@@ -442,7 +439,7 @@ function PrivacyTab() {
     <div>
       <InfoBox color={S.info}>
         Your conversations are stored securely in your own database.
-        OmniClaude never shares your data with third parties.
+        OmniChat never shares your data with third parties.
       </InfoBox>
       <SectionHead label="Data & Privacy" />
       <Row
@@ -483,8 +480,8 @@ function PrivacyTab() {
       <div
         style={{
           padding: "14px 16px",
-          background: "#fff1f2",
-          border: `1px solid rgba(192,57,43,0.2)`,
+          background: "var(--bg-card)",
+          border: `1px solid ${S.danger}33`,
           borderRadius: 10,
           display: "flex",
           alignItems: "center",
@@ -492,7 +489,7 @@ function PrivacyTab() {
         }}
       >
         <div>
-          <div style={{ fontSize: 14, fontWeight: 500, color: "#991b1b" }}>
+          <div style={{ fontSize: 14, fontWeight: 500, color: S.danger }}>
             Delete all conversations
           </div>
           <div style={{ fontSize: 12, color: S.t3, marginTop: 2 }}>
@@ -664,6 +661,9 @@ function ApiKeysTab() {
         <BuiltinCard key={p.id} provider={p} />
       ))}
 
+      {/* ── Free Models Section ── */}
+      <FreeModelsSection />
+
       {commercial.length > 0 && (
         <>
           <SectionHead label="Commercial Providers" />
@@ -704,8 +704,8 @@ function BuiltinCard({ provider }) {
     <div
       style={{
         padding: "12px 14px",
-        background: "#f0fdf4",
-        border: `1px solid #bbf7d0`,
+        background: "var(--bg-card)",
+        border: `1px solid ${S.success}44`,
         borderRadius: 10,
         display: "flex",
         alignItems: "center",
@@ -728,15 +728,85 @@ function BuiltinCard({ provider }) {
           <span style={{ color: "#fff", fontSize: 16 }}>✦</span>
         </div>
         <div>
-          <div style={{ fontSize: 14, fontWeight: 600, color: "#166534" }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: S.t1 }}>
             {provider.name}
           </div>
-          <div style={{ fontSize: 12, color: "#4ade80" }}>
+          <div style={{ fontSize: 12, color: S.success }}>
             Always available · No key required · Powered by Gemini 2.5 Flash
           </div>
         </div>
       </div>
       <Badge color="#16a34a">Free</Badge>
+    </div>
+  );
+}
+
+/* ── Free Models Section ── */
+function FreeModelsSection() {
+  return (
+    <div style={{ marginBottom: 20 }}>
+      <SectionHead label="Free Models" />
+      <div
+        style={{
+          padding: "12px 14px",
+          background: "var(--bg-card)",
+          border: `1px solid var(--border-md)`,
+          borderRadius: 12,
+          marginBottom: 10,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: 12,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 10,
+                background: "linear-gradient(135deg, #6366f1 0%, #ec4899 50%, #f59e0b 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <span style={{ color: "#fff", fontSize: 18 }}>∞</span>
+            </div>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: S.t1 }}>
+                Free AI Models
+              </div>
+              <div style={{ fontSize: 12, color: S.t3 }}>
+                Active & Rotated automatically · No API key needed
+              </div>
+            </div>
+          </div>
+          <Badge color="#7c3aed">Free</Badge>
+        </div>
+
+        <div
+          style={{
+            padding: "10px 14px",
+            background: "var(--bg)",
+            border: `1px solid var(--border)`,
+            borderRadius: 8,
+            fontSize: 12.5,
+            color: S.t2,
+            lineHeight: 1.6,
+          }}
+        >
+          💡 <strong>Consolidated Free Pool</strong>: When using <strong>Free Models</strong>, OmniChat coordinates requests dynamically through high-capacity free endpoints.
+          <div style={{ marginTop: 6, fontSize: 11.5, color: S.t3 }}>
+            Includes auto-rotation and rate-limit protection for <strong>Gemini 2.5 Flash</strong>, <strong>DeepSeek V3</strong>, <strong>Llama 3.3</strong>, and <strong>Mistral Small</strong>.
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -929,22 +999,41 @@ function ProvCard({ provider, onSave, onRemove }) {
             </div>
           )}
           {PDOC[provider.slug] && !isLocal && (
-            <a
-              href={PDOC[provider.slug]}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                fontSize: 11,
-                color: S.info,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 4,
-                marginTop: 6,
-                textDecoration: "underline",
-              }}
-            >
-              ↗ Get API key from {provider.name}
-            </a>
+            <div style={{ marginTop: 8 }}>
+              <a
+                href={PDOC[provider.slug]}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  fontSize: 11,
+                  color: "var(--accent)",
+                  background: "var(--accent-light)",
+                  border: "1px solid rgba(226,138,108,0.18)",
+                  borderRadius: 6,
+                  padding: "4px 10px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 5,
+                  textDecoration: "none",
+                  fontWeight: 500,
+                  transition: "background 80ms, transform 80ms",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(226,138,108,0.18)";
+                  e.currentTarget.style.transform = "translateY(-1px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "var(--accent-light)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
+              >
+                <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                </svg>
+                Retrieve {provider.name} API Key
+              </a>
+            </div>
           )}
         </div>
       )}
@@ -1159,8 +1248,8 @@ function McpTab() {
   return (
     <div>
       <InfoBox color="#7c3aed">
-        ⚡ <strong>Model Context Protocol (MCP)</strong> — Connect Claude to
-        external tools, databases, and services. MCP servers extend what Claude
+        ⚡ <strong>Model Context Protocol (MCP)</strong> — Connect your AI to
+        external tools, databases, and services. MCP servers extend what your assistant
         can do.
       </InfoBox>
 
@@ -1382,8 +1471,8 @@ function SkillsTab() {
   return (
     <div>
       <InfoBox color={S.accent}>
-        🛠 Skills extend Claude's capabilities. Enable or disable them to control
-        what Claude can do in conversations.
+        🛠 Skills extend your assistant's capabilities. Enable or disable them to control
+        what your AI can do in conversations.
       </InfoBox>
       <SectionHead label="Built-in Skills" />
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -1678,7 +1767,7 @@ function AboutTab() {
           </svg>
         </div>
         <div style={{ fontSize: 20, fontWeight: 700, color: S.t1 }}>
-          OmniClaude
+          OmniChat
         </div>
         <div style={{ fontSize: 13, color: S.t3, marginTop: 4 }}>
           Your personal multi-provider AI hub
@@ -1727,7 +1816,16 @@ function AboutTab() {
 }
 
 /* ══════════════ MAIN MODAL ════════════════════════════════════ */
-export default function SettingsModal({ onClose, initialTab = "apikeys" }) {
+export default function SettingsModal({
+  onClose,
+  initialTab = "apikeys",
+  theme,
+  setTheme,
+  density,
+  setDensity,
+  fontSize,
+  setFontSize,
+}) {
   const [activeTab, setActiveTab] = useState(
     TABS.find((t) => t.id === initialTab)?.id ||
       TABS.find((t) => t.label === initialTab)?.id ||
@@ -1745,7 +1843,16 @@ export default function SettingsModal({ onClose, initialTab = "apikeys" }) {
 
   const TAB_CONTENT = {
     profile: <ProfileTab />,
-    appearance: <AppearanceTab />,
+    appearance: (
+      <AppearanceTab
+        theme={theme}
+        setTheme={setTheme}
+        density={density}
+        setDensity={setDensity}
+        fontSize={fontSize}
+        setFontSize={setFontSize}
+      />
+    ),
     privacy: <PrivacyTab />,
     assistant: <AssistantTab />,
     apikeys: <ApiKeysTab />,
@@ -1825,7 +1932,7 @@ export default function SettingsModal({ onClose, initialTab = "apikeys" }) {
                 width: "100%",
                 padding: "8px 10px",
                 background:
-                  activeTab === tab.id ? "rgba(0,0,0,0.07)" : "transparent",
+                  activeTab === tab.id ? "var(--bg-active)" : "transparent",
                 border: "none",
                 borderRadius: 8,
                 cursor: "pointer",
@@ -1838,7 +1945,7 @@ export default function SettingsModal({ onClose, initialTab = "apikeys" }) {
               }}
               onMouseEnter={(e) => {
                 if (activeTab !== tab.id)
-                  e.currentTarget.style.background = "rgba(0,0,0,0.04)";
+                  e.currentTarget.style.background = "var(--bg-hover)";
               }}
               onMouseLeave={(e) => {
                 if (activeTab !== tab.id)
@@ -1893,7 +2000,7 @@ export default function SettingsModal({ onClose, initialTab = "apikeys" }) {
                 transition: "background 80ms",
               }}
               onMouseEnter={(e) =>
-                (e.currentTarget.style.background = "rgba(0,0,0,0.07)")
+                (e.currentTarget.style.background = "var(--bg-hover)")
               }
               onMouseLeave={(e) =>
                 (e.currentTarget.style.background = "transparent")

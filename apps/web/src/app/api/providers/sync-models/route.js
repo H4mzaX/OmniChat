@@ -9,8 +9,8 @@ async function fetchOpenRouterModels(apiKey) {
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
-      "HTTP-Referer": "https://omniclaude.app",
-      "X-Title": "OmniClaude",
+      "HTTP-Referer": "https://omnichat.app",
+      "X-Title": "OmniChat",
     },
   });
   if (!res.ok)

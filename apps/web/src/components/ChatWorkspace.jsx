@@ -57,33 +57,33 @@ const SettingsIcon = ({ size = 16 }) => (
   </svg>
 );
 
-/* ─── Claude avatar ───────────────────────────────────────────── */
-function ClaudeAvatar({ size = 28 }) {
+/* ─── Brand avatar ───────────────────────────────────────────── */
+function OmniAvatar({ size = 28 }) {
   return (
     <div
       style={{
         width: size,
         height: size,
         borderRadius: "50%",
-        background: "var(--accent)",
+        background: "var(--accent-light)",
+        border: "1.5px solid var(--accent)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         flexShrink: 0,
+        boxShadow: "var(--sh-xs)",
       }}
     >
-      <svg height={Math.round(size * 0.6)} viewBox="0 0 24 24" width={Math.round(size * 0.6)} xmlns="http://www.w3.org/2000/svg">
-        <path
-          d="M4.709 15.955l4.72-2.647.08-.23-.08-.128H9.2l-.79-.048-2.698-.073-2.339-.097-2.266-.122-.571-.121L0 11.784l.055-.352.48-.321.686.06 1.52.103 2.278.158 1.652.097 2.449.255h.389l.055-.157-.134-.098-.103-.097-2.358-1.596-2.552-1.688-1.336-.972-.724-.491-.364-.462-.158-1.008.656-.722.881.06.225.061.893.686 1.908 1.476 2.491 1.833.365.304.145-.103.019-.073-.164-.274-1.355-2.446-1.446-2.49-.644-1.032-.17-.619a2.97 2.97 0 0 1-.104-.729L6.283.134 6.696 0l.996.134.42.364.62 1.414 1.002 2.229 1.555 3.03.456.898.243.832.091.255h.158V9.01l.128-1.706.237-2.095.23-2.695.08-.76.376-.91.747-.492.584.28.48.685-.067.444-.286 1.851-.559 2.903-.364 1.942h.212l.243-.242.985-1.306 1.652-2.064.73-.82.85-.904.547-.431h1.033l.76 1.129-.34 1.166-1.064 1.347-.881 1.142-1.264 1.7-.79 1.36.073.11.188-.02 2.856-.606 1.543-.28 1.841-.315.833.388.091.395-.328.807-1.969.486-2.309.462-3.439.813-.042.03.049.061 1.549.146.662.036h1.622l3.02.225.79.522.474.638-.079.485-1.215.62-1.64-.389-3.829-.91-1.312-.329h-.182v.11l1.093 1.068 2.006 1.81 2.509 2.33.127.578-.322.455-.34-.049-2.205-1.657-.851-.747-1.926-1.62h-.128v.17l.444.649 2.345 3.521.122 1.08-.17.353-.608.213-.668-.122-1.374-1.925-1.415-2.167-1.143-1.943-.14.08-.674 7.254-.316.37-.729.28-.607-.461-.322-.747.322-1.476.389-1.924.315-1.53.286-1.9.17-.632-.012-.042-.14.018-1.434 1.967-2.18 2.945-1.726 1.845-.414.164-.717-.37.067-.662.401-.589 2.388-3.036 1.44-1.882.93-1.086-.006-.158h-.055L4.132 18.56l-1.13.146-.487-.456.061-.746.231-.243 1.908-1.312-.006.006z"
-          fill="#fff"
-          fillRule="nonzero"
-        />
+      <svg width={Math.round(size * 0.55)} height={Math.round(size * 0.55)} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" />
+        <path d="M12 6C8.69 6 6 8.69 6 12C6 15.31 8.69 18 12 18C15.31 18 18 15.31 18 12" stroke="var(--accent)" strokeWidth="1.5" strokeDasharray="3 3" />
+        <path d="M12 8L13.5 10.5L16 12L13.5 13.5L12 16L10.5 13.5L8 12L10.5 10.5L12 8Z" fill="var(--accent)" />
       </svg>
     </div>
   );
 }
 
-/* ─── Process note showing executed steps (Claude style) ──────── */
+/* ─── Process note showing executed steps ──────────────────────── */
 function ProcessNote({ fileName, isWorking }) {
   const [expanded, setExpanded] = useState(false);
   const ext = fileName?.split(".").pop()?.toLowerCase();
@@ -214,7 +214,7 @@ function TypingIndicator({ fileName }) {
         alignItems: "flex-start",
       }}
     >
-      <ClaudeAvatar />
+      <OmniAvatar />
       <div style={{ flex: 1, minWidth: 0, paddingTop: 3 }}>
         <div
           style={{
@@ -225,7 +225,7 @@ function TypingIndicator({ fileName }) {
           }}
         >
           <span style={{ fontSize: 12.5, fontWeight: 500, color: "var(--t2)" }}>
-            Claude
+            OmniChat
           </span>
         </div>
         {fileName && <ProcessNote fileName={fileName} isWorking={true} />}
@@ -259,7 +259,7 @@ function StreamingMessage({ content, modelId, thinking, fileName }) {
         alignItems: "flex-start",
       }}
     >
-      <ClaudeAvatar />
+      <OmniAvatar />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
@@ -270,7 +270,7 @@ function StreamingMessage({ content, modelId, thinking, fileName }) {
           }}
         >
           <span style={{ fontSize: 12.5, fontWeight: 500, color: "var(--t2)" }}>
-            Claude
+            OmniChat
           </span>
           {modelId && (
             <span
@@ -317,8 +317,57 @@ function StreamingMessage({ content, modelId, thinking, fileName }) {
 
 
 
-/* ─── Welcome / empty state (Claude.ai style) ─────────────────── */
-function WelcomeState({ greetingText, composer }) {
+/* Bento Grid Suggestion Items */
+const SUGGESTIONS = [
+  {
+    icon: (
+      <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+        <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+      </svg>
+    ),
+    title: "Draft an email",
+    desc: "Compose a professional response detailing pricing strategies.",
+    prompt: "Draft a polite and professional email response explaining our premium API key pricing and benefits to a startup customer."
+  },
+  {
+    icon: (
+      <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="16 18 22 12 16 6" />
+        <polyline points="8 6 2 12 8 18" />
+      </svg>
+    ),
+    title: "Optimize a SQL query",
+    desc: "Explain indexing tricks for quick multi-table joints.",
+    prompt: "Analyze and explain how to optimize a slow PostgreSQL query containing nested JOINs, GROUP BYs, and index strategies."
+  },
+  {
+    icon: (
+      <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4.5 16.5c-1.5 1.25-2.5 3.5-2.5 3.5h20s-1-2.25-2.5-3.5" />
+        <path d="M12 2C6.5 2 2 6.5 2 12c0 2.5 1 5 2.5 6.5l7.5-7.5 7.5 7.5c1.5-1.5 2.5-4 2.5-6.5 0-5.5-4.5-10-10-10z" />
+      </svg>
+    ),
+    title: "Analyze genetic variants",
+    desc: "Query non-coding regions and pathogenicity scores.",
+    prompt: "Explain how to analyze non-coding genomic variants in regulatory enhancers using chromatin accessibility and phyloP conservation scores."
+  },
+  {
+    icon: (
+      <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+        <line x1="8" y1="21" x2="16" y2="21" />
+        <line x1="12" y1="17" x2="12" y2="21" />
+      </svg>
+    ),
+    title: "MCP server tools",
+    desc: "Walk through setting up a Node or Python context server.",
+    prompt: "Give me a step-by-step tutorial on how to build and configure a custom Model Context Protocol (MCP) server in TypeScript/Node.js."
+  }
+];
+
+/* ─── Welcome / empty state (Premium Bento Grid) ─────────────────── */
+function WelcomeState({ greetingText, composer, onSendSuggestion }) {
   return (
     <div
       style={{
@@ -332,7 +381,7 @@ function WelcomeState({ greetingText, composer }) {
         margin: "0 auto",
         width: "100%",
         boxSizing: "border-box",
-        animation: "oc-slideup 300ms var(--ease)",
+        animation: "oc-slideup 350ms var(--ease)",
       }}
     >
       <div
@@ -341,25 +390,23 @@ function WelcomeState({ greetingText, composer }) {
           alignItems: "center",
           justifyContent: "center",
           gap: 12,
-          marginBottom: 36,
+          marginBottom: 32,
           width: "100%",
           flexWrap: "wrap",
         }}
       >
-        <svg height={36} viewBox="0 0 24 24" width={36} xmlns="http://www.w3.org/2000/svg" style={{ flex: "none" }}>
-          <path
-            d="M4.709 15.955l4.72-2.647.08-.23-.08-.128H9.2l-.79-.048-2.698-.073-2.339-.097-2.266-.122-.571-.121L0 11.784l.055-.352.48-.321.686.06 1.52.103 2.278.158 1.652.097 2.449.255h.389l.055-.157-.134-.098-.103-.097-2.358-1.596-2.552-1.688-1.336-.972-.724-.491-.364-.462-.158-1.008.656-.722.881.06.225.061.893.686 1.908 1.476 2.491 1.833.365.304.145-.103.019-.073-.164-.274-1.355-2.446-1.446-2.49-.644-1.032-.17-.619a2.97 2.97 0 0 1-.104-.729L6.283.134 6.696 0l.996.134.42.364.62 1.414 1.002 2.229 1.555 3.03.456.898.243.832.091.255h.158V9.01l.128-1.706.237-2.095.23-2.695.08-.76.376-.91.747-.492.584.28.48.685-.067.444-.286 1.851-.559 2.903-.364 1.942h.212l.243-.242.985-1.306 1.652-2.064.73-.82.85-.904.547-.431h1.033l.76 1.129-.34 1.166-1.064 1.347-.881 1.142-1.264 1.7-.79 1.36.073.11.188-.02 2.856-.606 1.543-.28 1.841-.315.833.388.091.395-.328.807-1.969.486-2.309.462-3.439.813-.042.03.049.061 1.549.146.662.036h1.622l3.02.225.79.522.474.638-.079.485-1.215.62-1.64-.389-3.829-.91-1.312-.329h-.182v.11l1.093 1.068 2.006 1.81 2.509 2.33.127.578-.322.455-.34-.049-2.205-1.657-.851-.747-1.926-1.62h-.128v.17l.444.649 2.345 3.521.122 1.08-.17.353-.608.213-.668-.122-1.374-1.925-1.415-2.167-1.143-1.943-.14.08-.674 7.254-.316.37-.729.28-.607-.461-.322-.747.322-1.476.389-1.924.315-1.53.286-1.9.17-.632-.012-.042-.14.018-1.434 1.967-2.18 2.945-1.726 1.845-.414.164-.717-.37.067-.662.401-.589 2.388-3.036 1.44-1.882.93-1.086-.006-.158h-.055L4.132 18.56l-1.13.146-.487-.456.061-.746.231-.243 1.908-1.312-.006.006z"
-            fill="#D97757"
-            fillRule="nonzero"
-          />
+        <svg width={36} height={36} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
+          <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" />
+          <path d="M12 6C8.69 6 6 8.69 6 12C6 15.31 8.69 18 12 18C15.31 18 18 15.31 18 12" stroke="var(--accent)" strokeWidth="1.5" strokeDasharray="3 3" />
+          <path d="M12 8L13.5 10.5L16 12L13.5 13.5L12 16L10.5 13.5L8 12L10.5 10.5L12 8Z" fill="var(--accent)" />
         </svg>
         <h1
           style={{
-            fontSize: 34,
-            fontWeight: 400,
-            fontFamily: "'Newsreader', Georgia, serif",
+            fontSize: 28,
+            fontWeight: 500,
+            fontFamily: "var(--font)",
             color: "var(--t1)",
-            letterSpacing: "-0.01em",
+            letterSpacing: "-0.02em",
             lineHeight: 1.2,
             margin: 0,
             textAlign: "center",
@@ -368,7 +415,77 @@ function WelcomeState({ greetingText, composer }) {
           {greetingText}
         </h1>
       </div>
-      <div style={{ width: "100%" }}>
+
+      {/* Bento Grid Suggestions */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          gap: 12,
+          width: "100%",
+          maxWidth: 680,
+          margin: "12px 0 28px",
+          boxSizing: "border-box",
+        }}
+      >
+        {SUGGESTIONS.map((s, i) => (
+          <div
+            key={i}
+            onClick={() => onSendSuggestion && onSendSuggestion(s.prompt)}
+            className="oc-glass"
+            style={{
+              padding: "14px 16px",
+              borderRadius: 12,
+              cursor: "pointer",
+              textAlign: "left",
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+              transition: "transform 180ms var(--ease), border-color 180ms, box-shadow 180ms, background-color 180ms",
+              boxShadow: "var(--sh-xs)",
+              animation: "oc-card-in 300ms var(--ease) " + (i * 60) + "ms both",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-3px)";
+              e.currentTarget.style.borderColor = "var(--accent)";
+              e.currentTarget.style.boxShadow = "var(--sh-md)";
+              e.currentTarget.style.background = "var(--bg-hover)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.borderColor = "var(--border)";
+              e.currentTarget.style.boxShadow = "var(--sh-xs)";
+              e.currentTarget.style.background = "";
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: 8,
+                  background: "var(--accent-light)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                  color: "var(--accent)",
+                }}
+              >
+                {s.icon}
+              </div>
+              <span style={{ fontSize: 13.5, fontWeight: 600, color: "var(--t1)" }}>
+                {s.title}
+              </span>
+            </div>
+            <p style={{ fontSize: 12, color: "var(--t3)", lineHeight: 1.4, margin: 0 }}>
+              {s.desc}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ width: "100%", maxWidth: 680 }}>
         {composer}
       </div>
     </div>
@@ -739,11 +856,12 @@ export default function ChatWorkspace({
               greetingText={
                 (() => {
                   const hr = new Date().getHours();
-                  if (hr >= 7 && hr < 16) return "Coffee and Claude time?";
+                  if (hr >= 7 && hr < 16) return "Coffee and OmniChat time?";
                   return "Hi Ameer! What are you building today?";
                 })()
               }
               composer={composer}
+              onSendSuggestion={handleSend}
             />
           </div>
         ) : (
@@ -762,11 +880,11 @@ export default function ChatWorkspace({
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <ClaudeAvatar size={22} />
+                  <OmniAvatar size={22} />
                   <span
                     style={{ fontSize: 14, fontWeight: 500, color: "var(--t1)" }}
                   >
-                    {selectedModel?.display_name || "Claude"}
+                    {selectedModel?.display_name || "OmniChat"}
                   </span>
                 </div>
                 <div

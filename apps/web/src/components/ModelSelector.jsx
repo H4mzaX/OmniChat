@@ -296,7 +296,7 @@ export default function ModelSelector({ selectedModelId, onSelect }) {
                     display: "flex",
                     alignItems: "center",
                     gap: 6,
-                    background: "rgba(0,0,0,0.03)",
+                    background: "var(--bg)",
                     border: "1px solid var(--border)",
                     borderRadius: 8,
                     padding: "4px 8px"
@@ -434,7 +434,7 @@ function ToggleSwitch() {
         cursor: "pointer",
         position: "relative",
         flexShrink: 0,
-        background: on ? "var(--accent)" : "rgba(0,0,0,0.15)",
+        background: on ? "var(--accent)" : "var(--border-strong)",
         transition: "background 150ms",
         padding: 0,
       }}

@@ -1,5 +1,5 @@
 import { PassThrough } from "node:stream";
-import { renderToPipeableStream, renderToReadableStream } from "react-dom/server";
+import ReactDOMServer from "react-dom/server";
 import { ServerRouter, type EntryContext } from "react-router";
 import { isbot } from "isbot";
 
@@ -12,9 +12,9 @@ export default function handleRequest(
   // Detect Cloudflare / Web Worker runtime dynamically
   const isCloudflare =
     typeof globalThis.caches !== "undefined" ||
-    typeof renderToReadableStream !== "undefined";
+    typeof ReactDOMServer.renderToReadableStream !== "undefined";
 
-  if (isCloudflare && typeof renderToReadableStream === "function") {
+  if (isCloudflare && typeof ReactDOMServer.renderToReadableStream === "function") {
     return handleBrowserRequest(
       request,
       responseStatusCode,
@@ -37,7 +37,12 @@ async function handleBrowserRequest(
   responseHeaders: Headers,
   routerContext: EntryContext
 ) {
-  const body = await renderToReadableStream(
+  const renderStream = ReactDOMServer.renderToReadableStream;
+  if (!renderStream) {
+    throw new Error("renderToReadableStream is not supported in this environment");
+  }
+
+  const body = await renderStream(
     <ServerRouter context={routerContext} url={request.url} />,
     {
       signal: request.signal,
@@ -71,7 +76,13 @@ function handleNodeRequest(
     const userAgent = request.headers.get("user-agent");
     const isBot = userAgent ? isbot(userAgent) : false;
 
-    const { pipe, abort } = renderToPipeableStream(
+    const renderStream = ReactDOMServer.renderToPipeableStream;
+    if (!renderStream) {
+      reject(new Error("renderToPipeableStream is not supported in this environment"));
+      return;
+    }
+
+    const { pipe, abort } = renderStream(
       <ServerRouter context={routerContext} url={request.url} />,
       {
         onShellReady() {

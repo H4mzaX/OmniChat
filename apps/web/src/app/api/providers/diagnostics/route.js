@@ -16,8 +16,8 @@ const TEST_ENDPOINTS = {
     method: "GET",
     headers: (k) => ({
       Authorization: `Bearer ${k}`,
-      "HTTP-Referer": "https://omniclaude.app",
-      "X-Title": "OmniClaude",
+      "HTTP-Referer": "https://omnichat.app",
+      "X-Title": "OmniChat",
     }),
   },
   groq: {

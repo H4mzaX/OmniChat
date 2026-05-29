@@ -188,14 +188,15 @@ function ProcessNote({ fileName, isWorking }) {
             height={14}
             viewBox="0 0 24 24"
             fill="none"
+            xmlns="http://www.w3.org/2000/svg"
             style={{
               animation: "spin 1.8s linear infinite",
+              flexShrink: 0,
             }}
           >
-            <path
-              d="M4.709 15.955l4.72-2.647.08-.23-.08-.128H9.2l-.79-.048-2.698-.073-2.339-.097-2.266-.122-.571-.121L0 11.784l.055-.352.48-.321.686.06 1.52.103 2.278.158 1.652.097 2.449.255h.389l.055-.157-.134-.098-.103-.097-2.358-1.596-2.552-1.688-1.336-.972-.724-.491-.364-.462-.158-1.008.656-.722.881.06.225.061.893.686 1.908 1.476 2.491 1.833.365.304.145-.103.019-.073-.164-.274-1.355-2.446-1.446-2.49-.644-1.032-.17-.619a2.97 2.97 0 0 1-.104-.729L6.283.134 6.696 0l.996.134.42.364.62 1.414 1.002 2.229 1.555 3.03.456.898.243.832.091.255h.158V9.01l.128-1.706.237-2.095.23-2.695.08-.76.376-.91.747-.492.584.28.48.685-.067.444-.286 1.851-.559 2.903-.364 1.942h.212l.243-.242.985-1.306 1.652-2.064.73-.82.85-.904.547-.431h1.033l.76 1.129-.34 1.166-1.064 1.347-.881 1.142-1.264 1.7-.79 1.36.073.11.188-.02 2.856-.606 1.543-.28 1.841-.315.833.388.091.395-.328.807-1.969.486-2.309.462-3.439.813-.042.03.049.061 1.549.146.662.036h1.622l3.02.225.79.522.474.638-.079.485-1.215.62-1.64-.389-3.829-.91-1.312-.329h-.182v.11l1.093 1.068 2.006 1.81 2.509 2.33.127.578-.322.455-.34-.049-2.205-1.657-.851-.747-1.926-1.62h-.128v.17l.444.649 2.345 3.521.122 1.08-.17.353-.608.213-.668-.122-1.374-1.925-1.415-2.167-1.143-1.943-.14.08-.674 7.254-.316.37-.729.28-.607-.461-.322-.747.322-1.476.389-1.924.315-1.53.286-1.9.17-.632-.012-.042-.14.018-1.434 1.967-2.18 2.945-1.726 1.845-.414.164-.717-.37.067-.662.401-.589 2.388-3.036 1.44-1.882.93-1.086-.006-.158h-.055L4.132 18.56l-1.13.146-.487-.456.061-.746.231-.243 1.908-1.312-.006.006z"
-              fill="var(--accent)"
-            />
+            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" />
+            <path d="M12 6C8.69 6 6 8.69 6 12C6 15.31 8.69 18 12 18C15.31 18 18 15.31 18 12" stroke="var(--accent)" strokeWidth="1.5" strokeDasharray="3 3" />
+            <path d="M12 8L13.5 10.5L16 12L13.5 13.5L12 16L10.5 13.5L8 12L10.5 10.5L12 8Z" fill="var(--accent)" />
           </svg>
           <span style={{ color: "var(--t2)", fontWeight: 400 }}>Working</span>
         </div>
@@ -203,53 +204,79 @@ function ProcessNote({ fileName, isWorking }) {
     </div>
   );}
 
-/* ─── Typing indicator (3 bouncing dots) ──────────────────────── */
+/* ─── Typing indicator (Claude-like text process + spark spinner) ──────────────────────── */
 function TypingIndicator({ fileName }) {
   return (
     <div
       style={{
         display: "flex",
+        alignItems: "center",
         gap: 10,
-        padding: "3px 24px",
-        alignItems: "flex-start",
+        padding: "12px 24px",
+        fontSize: 13.5,
+        color: "var(--t3)",
+        fontWeight: 400,
+        fontFamily: "var(--font)",
       }}
     >
-      <OmniAvatar />
-      <div style={{ flex: 1, minWidth: 0, paddingTop: 3 }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            marginBottom: 6,
-          }}
-        >
-          <span style={{ fontSize: 12.5, fontWeight: 500, color: "var(--t2)" }}>
-            OmniChat
-          </span>
-        </div>
-        {fileName && <ProcessNote fileName={fileName} isWorking={true} />}
-        <div style={{ display: "flex", gap: 5, marginTop: fileName ? 12 : 0 }}>
-          {[0, 180, 360].map((d) => (
-            <div
-              key={d}
-              style={{
-                width: 8,
-                height: 8,
-                borderRadius: "50%",
-                background: "var(--t4)",
-                animation: `oc-dot 1.2s ease-in-out ${d}ms infinite`,
-              }}
-            />
-          ))}
-        </div>
-      </div>
+      <svg
+        width={16}
+        height={16}
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{
+          animation: "spin 1.8s linear infinite",
+          flexShrink: 0,
+        }}
+      >
+        <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" />
+        <path d="M12 6C8.69 6 6 8.69 6 12C6 15.31 8.69 18 12 18C15.31 18 18 15.31 18 12" stroke="var(--accent)" strokeWidth="1.5" strokeDasharray="3 3" />
+        <path d="M12 8L13.5 10.5L16 12L13.5 13.5L12 16L10.5 13.5L8 12L10.5 10.5L12 8Z" fill="var(--accent)" />
+      </svg>
+      <span>
+        {fileName ? `Reading ${fileName}...` : "Working..."}
+      </span>
     </div>
   );
 }
 
+/* ── Extract thinking/reasoning from content ───────────────────── */
+function extractReasoning(content) {
+  if (!content) return { reasoning: null, body: "" };
+
+  // Try [thinking] ... [/thinking]
+  let match = content.match(/^\[thinking\]\n?([\s\S]*?)(?:\[\/thinking\]|$)/);
+  if (match) {
+    const hasClosing = content.includes("[/thinking]");
+    const reasoning = match[1].trim();
+    let body = hasClosing ? content.slice(match[0].length) : "";
+    body = body.replace(/^\n*<response>\n?/, "");
+    body = body.replace(/\n*<\/response>\n*$/, "");
+    return { reasoning, body: body.trim() || body };
+  }
+
+  // Try <thinking> ... </thinking>
+  match = content.match(/^<thinking>\n?([\s\S]*?)(?:<\/thinking>|$)/);
+  if (match) {
+    const hasClosing = content.includes("</thinking>");
+    const reasoning = match[1].trim();
+    let body = hasClosing ? content.slice(match[0].length) : "";
+    body = body.replace(/^\n*<response>\n?/, "");
+    body = body.replace(/\n*<\/response>\n*$/, "");
+    return { reasoning, body: body.trim() || body };
+  }
+
+  return { reasoning: null, body: content };
+}
+
 /* ─── Streaming message with blinking cursor + thinking ────────── */
 function StreamingMessage({ content, modelId, thinking, fileName }) {
+  const [showReasoning, setShowReasoning] = useState(true);
+  const parsed = extractReasoning(content);
+  const activeThinking = thinking || parsed.reasoning;
+  const activeBody = parsed.body;
+
   return (
     <div
       style={{
@@ -287,27 +314,71 @@ function StreamingMessage({ content, modelId, thinking, fileName }) {
           )}
         </div>
         {fileName && <ProcessNote fileName={fileName} isWorking={true} />}
-        {thinking && (
-          <div
-            style={{
-              background: "var(--bg-sidebar)",
-              borderRadius: 8,
-              padding: "10px 14px",
-              marginBottom: 10,
-              fontSize: 13,
-              color: "var(--t3)",
-              fontStyle: "italic",
-              lineHeight: 1.55,
-            }}
-          >
-            <div style={{ fontWeight: 500, color: "var(--t2)", marginBottom: 4, fontSize: 12 }}>
-              Thinking...
-            </div>
-            {thinking}
+        {activeThinking && (
+          <div style={{ marginBottom: 8, animation: "oc-fadein 200ms ease" }}>
+            <button
+              onClick={() => setShowReasoning((v) => !v)}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                fontSize: 12,
+                color: "var(--accent)",
+                background: "var(--bg-sidebar)",
+                border: "1px solid var(--border-md)",
+                borderRadius: 6,
+                padding: "4px 10px",
+                cursor: "pointer",
+                fontFamily: "var(--font)",
+                fontWeight: 500,
+                transition: "all 120ms ease",
+                outline: "none",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "var(--accent)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "var(--border-md)";
+              }}
+            >
+              <svg
+                width={12}
+                height={12}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2.5}
+                style={{
+                  transform: showReasoning ? "rotate(90deg)" : "rotate(0deg)",
+                  transition: "transform 150ms ease",
+                }}
+              >
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+              <span>{activeBody ? "Thought Process" : "Thinking..."}</span>
+            </button>
+            {showReasoning && (
+              <div
+                style={{
+                  background: "var(--bg-sidebar)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 8,
+                  padding: "10px 14px",
+                  marginTop: 6,
+                  fontSize: 13,
+                  color: "var(--t3)",
+                  fontStyle: "italic",
+                  lineHeight: 1.55,
+                  whiteSpace: "pre-wrap",
+                }}
+              >
+                {activeThinking}
+              </div>
+            )}
           </div>
         )}
         <div className="oc-prose" style={{ whiteSpace: "pre-wrap" }}>
-          {content}
+          {activeBody}
           <span className="oc-cursor" />
         </div>
       </div>
@@ -367,7 +438,7 @@ const SUGGESTIONS = [
 ];
 
 /* ─── Welcome / empty state (Premium Bento Grid) ─────────────────── */
-function WelcomeState({ greetingText, composer, onSendSuggestion }) {
+function WelcomeState({ greetingText, composer, onSendSuggestion, isMobile }) {
   return (
     <div
       style={{
@@ -376,7 +447,7 @@ function WelcomeState({ greetingText, composer, onSendSuggestion }) {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        padding: "40px 24px 80px",
+        padding: isMobile ? "24px 16px 40px" : "40px 24px 80px",
         maxWidth: 800,
         margin: "0 auto",
         width: "100%",
@@ -390,7 +461,7 @@ function WelcomeState({ greetingText, composer, onSendSuggestion }) {
           alignItems: "center",
           justifyContent: "center",
           gap: 12,
-          marginBottom: 32,
+          marginBottom: isMobile ? 18 : 32,
           width: "100%",
           flexWrap: "wrap",
         }}
@@ -402,11 +473,11 @@ function WelcomeState({ greetingText, composer, onSendSuggestion }) {
         </svg>
         <h1
           style={{
-            fontSize: 28,
-            fontWeight: 500,
-            fontFamily: "var(--font)",
+            fontSize: isMobile ? 26 : 34,
+            fontWeight: 400,
+            fontFamily: "var(--font-serif)",
             color: "var(--t1)",
-            letterSpacing: "-0.02em",
+            letterSpacing: "-0.03em",
             lineHeight: 1.2,
             margin: 0,
             textAlign: "center",
@@ -417,17 +488,18 @@ function WelcomeState({ greetingText, composer, onSendSuggestion }) {
       </div>
 
       {/* Bento Grid Suggestions */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: 12,
-          width: "100%",
-          maxWidth: 680,
-          margin: "12px 0 28px",
-          boxSizing: "border-box",
-        }}
-      >
+      {!isMobile && (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: 12,
+            width: "100%",
+            maxWidth: 680,
+            margin: "12px 0 28px",
+            boxSizing: "border-box",
+          }}
+        >
         {SUGGESTIONS.map((s, i) => (
           <div
             key={i}
@@ -484,6 +556,7 @@ function WelcomeState({ greetingText, composer, onSendSuggestion }) {
           </div>
         ))}
       </div>
+      )}
 
       <div style={{ width: "100%", maxWidth: 680 }}>
         {composer}
@@ -750,45 +823,49 @@ export default function ChatWorkspace({
             const line = buf.slice(0, nl).trimEnd();
             buf = buf.slice(nl + 1);
             if (!line.startsWith("data:")) continue;
+            let ev;
             try {
-              const ev = JSON.parse(line.slice(5).trim());
-              if (ev.session_id) {
-                const realSid = ev.session_id;
-                if (sid === "new") {
-                  const cacheData = qc.getQueryData(["messages", "new"]);
-                  if (cacheData) {
-                    qc.setQueryData(["messages", realSid], cacheData);
-                  }
-                  onSessionCreate(realSid);
-                  sid = realSid;
+              ev = JSON.parse(line.slice(5).trim());
+            } catch (_) {
+              continue;
+            }
+
+            if (ev.error) {
+              throw new Error(ev.error);
+            }
+
+            if (ev.session_id) {
+              const realSid = ev.session_id;
+              if (sid === "new") {
+                const cacheData = qc.getQueryData(["messages", "new"]);
+                if (cacheData) {
+                  qc.setQueryData(["messages", realSid], cacheData);
                 }
+                onSessionCreate(realSid);
+                sid = realSid;
               }
-              if (ev.token) {
-                acc += ev.token;
-                setStreamText(acc);
+            }
+            if (ev.token) {
+              acc += ev.token;
+              setStreamText(acc);
+            }
+            if (ev.thinking) {
+              setStreamThinking(ev.thinking);
+            }
+            if (ev.done) {
+              const art = detectArtifact(acc);
+              if (art) {
+                setArtifact(art);
+                setArtifactOpen(true);
               }
-              if (ev.thinking) {
-                setStreamThinking(ev.thinking);
-              }
-              if (ev.error) throw new Error(ev.error);
-              if (ev.done) {
-                const art = detectArtifact(acc);
-                if (art) {
-                  setArtifact(art);
-                  setArtifactOpen(true);
-                }
-                await qc.invalidateQueries({ queryKey: ["messages", sid] });
-                await qc.invalidateQueries({ queryKey: ["sessions"] });
-              }
-            } catch (_) {}
+              await qc.invalidateQueries({ queryKey: ["messages", sid] });
+              await qc.invalidateQueries({ queryKey: ["sessions"] });
+            }
           }
         }
       } catch (err) {
         if (err.name !== "AbortError") {
           setStreamError(err.message);
-          qc.setQueryData(["messages", sid], (old) => ({
-            messages: (old?.messages || []).filter((m) => m.id !== tempId),
-          }));
         }
       } finally {
         setIsStreaming(false);
@@ -810,6 +887,7 @@ export default function ChatWorkspace({
       selectedModelId={selectedModelId}
       onModelSelect={onModelSelect}
       hasMessages={!isEmpty}
+      isMobile={isMobile}
     />
   );
 
@@ -856,12 +934,14 @@ export default function ChatWorkspace({
               greetingText={
                 (() => {
                   const hr = new Date().getHours();
+                  if (hr >= 0 && hr < 7) return "Moonlit chat?";
                   if (hr >= 7 && hr < 16) return "Coffee and OmniChat time?";
-                  return "Hi Ameer! What are you building today?";
+                  return "What can I help you build today?";
                 })()
               }
               composer={composer}
               onSendSuggestion={handleSend}
+              isMobile={isMobile}
             />
           </div>
         ) : (

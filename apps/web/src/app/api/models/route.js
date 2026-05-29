@@ -8,7 +8,21 @@ export async function GET(request) {
 
     // Ensure the single "Free Models" entry exists and disable individual free models
     try {
-      const [builtinProvider] = await sql`SELECT id FROM providers WHERE slug = 'builtin' LIMIT 1`;
+      let builtinProvider;
+      const providers = await sql`SELECT id FROM providers WHERE slug = 'builtin' LIMIT 1`;
+      if (providers.length > 0) {
+        builtinProvider = providers[0];
+        // Ensure it's marked as connected
+        await sql`UPDATE providers SET is_connected = true WHERE id = ${builtinProvider.id}`;
+      } else {
+        const [newProvider] = await sql`
+          INSERT INTO providers (name, slug, provider_type, is_connected)
+          VALUES ('Built-in', 'builtin', 'builtin', true)
+          RETURNING id
+        `;
+        builtinProvider = newProvider;
+      }
+
       if (builtinProvider) {
         // Disable old individual free models to hide them
         await sql`

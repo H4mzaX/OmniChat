@@ -1,5 +1,7 @@
 import sql from "../../utils/sql.js";
 import Anthropic from "@anthropic-ai/sdk";
+import fs from "fs";
+import path from "path";
 
 /* ─── Content helpers ──────────────────────────────────────────── */
 function parseContent(val) {
@@ -7,6 +9,34 @@ function parseContent(val) {
     try { return JSON.parse(val); } catch { return val; }
   }
   return val;
+}
+
+function extractRelevantChunks(text, query, maxChars = 30000) {
+  if (!text || text.length <= maxChars) return text;
+  const keywords = (query || "").toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(w => w.length > 3);
+  if (keywords.length === 0) {
+    return text.slice(0, maxChars) + "\n\n... [Content truncated for optimal speed and context length] ...";
+  }
+  const paragraphs = text.split(/\n\n+/);
+  const scored = paragraphs.map(p => {
+    let score = 0;
+    const lower = p.toLowerCase();
+    for (const kw of keywords) {
+      if (lower.includes(kw)) score += 1;
+    }
+    return { text: p, score };
+  });
+  const best = scored
+    .filter(p => p.score > 0)
+    .slice(0, 15)
+    .map(p => p.text)
+    .join("\n\n");
+  if (best.length < 2000) {
+    return text.slice(0, Math.floor(maxChars / 2)) + "\n\n... [Truncated for Context Optimization] ...\n\n" + text.slice(-Math.floor(maxChars / 2));
+  }
+  return best + `\n\n... [Relevant chunks retrieved matching keywords: ${keywords.slice(0, 5).join(", ")}] ...`;
 }
 
 function toOAIContent(c) {
@@ -47,6 +77,32 @@ function toLLMContent(c) {
     }
   }
   return c;
+}
+
+function compileSystemPrompt(userPrompt, modelId, providerSlug) {
+  const constitution = `You are OmniChat, a highly capable, objective, and cautious AI assistant, built on the principles of Constitutional AI.
+You prioritize extreme accuracy, deep analytical reasoning, and rigorous caution over speed.
+If you are unsure of any fact, calculation, or answer, state your uncertainty clearly and transparently instead of speculating.`;
+
+  const thinkingInstruction = `Before providing your final answer, you MUST think step-by-step. Outline your entire reasoning process, planning, and alternative approaches inside a <thinking> block, then provide your clean final response inside a <response> block.
+
+Strict XML Format Requirement:
+<thinking>
+[Write your step-by-step thoughts, analysis, plan, calculations, and self-corrections here]
+</thinking>
+<response>
+[Write your clean, beautifully formatted final response here]
+</response>`;
+
+  let parts = [constitution];
+  const nativelySupportsThinking = modelId?.includes("sonnet") || modelId?.includes("opus");
+  if (!nativelySupportsThinking) {
+    parts.push(thinkingInstruction);
+  }
+  if (userPrompt?.trim()) {
+    parts.push(`Additional Instructions:\n${userPrompt}`);
+  }
+  return parts.join("\n\n");
 }
 
 /* ─── Anthropic streaming (primary engine) ─────────────────────── */
@@ -163,10 +219,33 @@ function makeStream(fn) {
 /* ─── POST /api/chat/stream ───────────────────────────────────── */
 export async function POST(request) {
   let body;
-  try { body = await request.json(); } catch { return Response.json({ error: "Invalid JSON" }, { status: 400 }); }
+  try {
+    body = await request.json();
+  } catch (jsonErr) {
+    try {
+      fs.appendFileSync(
+        path.join(process.cwd(), 'server-debug.log'),
+        `[${new Date().toISOString()}] JSON Parse error: ${jsonErr.message}\n`
+      );
+    } catch (_) {}
+    return Response.json({ error: "Invalid JSON: " + jsonErr.message }, { status: 400 });
+  }
+
+  try {
+    fs.appendFileSync(
+      path.join(process.cwd(), 'server-debug.log'),
+      `[${new Date().toISOString()}] POST body: ${JSON.stringify(body)}\n`
+    );
+  } catch (_) {}
 
   const { session_id, content, files, model_id, provider_slug, system_prompt } = body;
   if (!session_id || !model_id || !provider_slug) {
+    try {
+      fs.appendFileSync(
+        path.join(process.cwd(), 'server-debug.log'),
+        `[${new Date().toISOString()}] POST 400 fail: missing params. session_id=${session_id}, model_id=${model_id}, provider_slug=${provider_slug}\n`
+      );
+    } catch (_) {}
     return Response.json({ error: "Required: session_id, model_id, provider_slug" }, { status: 400 });
   }
   if (!content?.trim() && (!files || files.length === 0)) {
@@ -212,7 +291,11 @@ export async function POST(request) {
         if (isImg) {
           blocks.push({ type: "image", source: { type: "base64", media_type: f.type, data: f.base64 } });
         } else {
-          blocks.push({ type: "file", name: f.name, size: f.size, ext: f.ext || f.name?.split(".").pop(), text: f.text || "" });
+          let fileText = f.text || "";
+          if (fileText.length > 40000) {
+            fileText = extractRelevantChunks(fileText, content, 30000);
+          }
+          blocks.push({ type: "file", name: f.name, size: f.size, ext: f.ext || f.name?.split(".").pop(), text: fileText });
         }
       }
       userContent = JSON.stringify(blocks);
@@ -239,7 +322,8 @@ export async function POST(request) {
         ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ session_id: actualSessionId })}\n\n`));
         try {
           const baseUrl = provider.base_url || undefined;
-          const response = await anthropicStream(apiKey, model_id, msgs, system_prompt, baseUrl);
+          const compiledSys = compileSystemPrompt(system_prompt, model_id, provider_slug);
+          const response = await anthropicStream(apiKey, model_id, msgs, compiledSys, baseUrl);
 
           for await (const ev of response) {
             if (ev.type === "content_block_delta" && ev.delta?.type === "thinking_delta") {
@@ -294,8 +378,9 @@ export async function POST(request) {
 
     /* ── Built-in free model (OmniChat Free with 100% Resilient Retry Pipeline) ── */
     if (provider_slug === "builtin") {
+      const compiledSys = compileSystemPrompt(system_prompt, model_id, provider_slug);
       const platformMsgs = msgs.map((m) => ({ role: m.role, content: toLLMContent(parseContent(m.content)) }));
-      if (system_prompt) platformMsgs.unshift({ role: "system", content: system_prompt });
+      if (compiledSys) platformMsgs.unshift({ role: "system", content: compiledSys });
       const createApi = process.env.NEXT_PUBLIC_CREATE_BASE_URL || "https://www.create.xyz";
       const projectGroupId = process.env.NEXT_PUBLIC_PROJECT_GROUP_ID;
 
@@ -309,7 +394,7 @@ export async function POST(request) {
         // Highly resilient 3-attempt loop with backoff for 100% reliability
         for (let attempt = 1; attempt <= 3; attempt++) {
           const ac = new AbortController();
-          const timer = setTimeout(() => ac.abort(), 12000); // 12s timeout per attempt
+          const timer = setTimeout(() => ac.abort(), 25000); // 25s timeout per attempt
 
           try {
             const headers = { "Content-Type": "application/json" };
@@ -359,18 +444,18 @@ export async function POST(request) {
         }
 
         const ms = Date.now() - t0;
-        const inTok = Math.ceil(content.length / 4);
+        const inTok = Math.ceil((content || "").length / 4);
         const outTok = Math.ceil(acc.length / 4);
         let savedId = null;
         try {
           const [saved] = await sql`
             INSERT INTO messages (session_id, role, content, model_id, provider_id, input_tokens, output_tokens, estimated_cost, latency_ms)
-            VALUES (${actualSessionId}, 'assistant', ${acc || "(no output)"}, ${activeModelUsed}, ${provider.id}, ${inTok}, ${outTok}, 0, ${ms}) RETURNING id`;
+            VALUES (${actualSessionId}, 'assistant', ${acc || "(no output)"}, ${model_id}, ${provider.id}, ${inTok}, ${outTok}, 0, ${ms}) RETURNING id`;
           savedId = saved?.id;
           await sql`UPDATE chat_sessions SET message_count = message_count + 2, total_tokens = total_tokens + ${inTok + outTok}, updated_at = NOW() WHERE id = ${actualSessionId}`;
           const [sess] = await sql`SELECT title FROM chat_sessions WHERE id = ${actualSessionId}`;
           if (!sess?.title || sess.title === "New Chat") {
-            await sql`UPDATE chat_sessions SET title = ${content.slice(0, 80)} WHERE id = ${actualSessionId}`;
+            await sql`UPDATE chat_sessions SET title = ${content ? content.slice(0, 80) : "New Chat"} WHERE id = ${actualSessionId}`;
           }
         } catch (dbErr) { console.error("DB:", dbErr); }
         ctrl.enqueue(enc.encode(`data: ${JSON.stringify({ done: true, message_id: savedId, input_tokens: inTok, output_tokens: outTok, latency_ms: ms })}\n\n`));
@@ -381,13 +466,14 @@ export async function POST(request) {
     }
 
     /* ── Non-Anthropic providers (OpenRouter / OAI) ── */
+    const compiledSys = compileSystemPrompt(system_prompt, model_id, provider_slug);
     let upstream;
     if (provider_slug === "openrouter") {
-      upstream = await fetchOpenRouter(apiKey, model_id, msgs, system_prompt);
+      upstream = await fetchOpenRouter(apiKey, model_id, msgs, compiledSys);
     } else {
       const base = provider.base_url;
       if (!base) return Response.json({ error: `No base URL for: ${provider_slug}` }, { status: 400 });
-      upstream = await fetchOAI(apiKey, base, model_id, msgs, system_prompt);
+      upstream = await fetchOAI(apiKey, base, model_id, msgs, compiledSys);
     }
 
     if (!upstream.ok) {
@@ -437,6 +523,12 @@ export async function POST(request) {
     });
   } catch (err) {
     console.error("/api/chat/stream:", err);
+    try {
+      fs.appendFileSync(
+        path.join(process.cwd(), 'server-debug.log'),
+        `[${new Date().toISOString()}] POST error: ${err.message}\n`
+      );
+    } catch (_) {}
     return Response.json({ error: err.message }, { status: 500 });
   }
 }

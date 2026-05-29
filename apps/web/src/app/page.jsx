@@ -9,18 +9,18 @@ import CompareView from "../components/CompareView";
 /* ─── Claude.ai–faithful global tokens + Premium Obsidian Dark Mode ──────────────────────── */
 const GLOBAL_CSS = `
   :root {
-    --font:       'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    --font-serif:  'Newsreader', 'Copernicus', 'Georgia', serif;
+    --font:       system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-serif:  "tiempos", "Tiempos Headline", "Georgia", "Cambria", serif;
     --font-mono:  "SF Mono","Fira Code",Menlo,monospace;
     --font-family-primary: var(--font);
 
     /* Palette — Light Mode (Warm Sand & Cream) */
-    --bg:            #f9f9f6;
-    --bg-sidebar:    #f3f3ee;
+    --bg:            #fbfaf7;
+    --bg-sidebar:    #f3f0e9;
     --bg-card:       #ffffff;
     --bg-hover:      rgba(20,20,19,0.04);
     --bg-active:     rgba(20,20,19,0.07);
-    --bg-user-bubble: #f0ece5;
+    --bg-user-bubble: #f0ece1;
 
     --border:        rgba(120,100,75,0.10);
     --border-md:     rgba(120,100,75,0.18);
@@ -31,9 +31,9 @@ const GLOBAL_CSS = `
     --t3: #6c6a64;   /* tertiary / muted */
     --t4: #8e8b82;   /* placeholder */
 
-    --accent:       #cc785c;
-    --accent-hov:   #b8664a;
-    --accent-light: rgba(204,120,92,0.10);
+    --accent:       #da755c;
+    --accent-hov:   #c76047;
+    --accent-light: rgba(218,117,92,0.10);
 
     --send-bg:      #141413;
     --send-hov:     #3d3d3a;
@@ -567,30 +567,35 @@ export default function AppShell() {
                 }}
               >
                 <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="3" y1="12" x2="21" y2="12" />
-                  <line x1="3" y1="6" x2="21" y2="6" />
-                  <line x1="3" y1="18" x2="21" y2="18" />
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <line x1="9" y1="3" x2="9" y2="21" />
                 </svg>
               </button>
 
-              <span
+              <div
                 style={{
-                  fontSize: 16.5,
-                  fontWeight: 600,
-                  fontFamily: "var(--font)",
-                  letterSpacing: "-0.02em",
-                  color: "var(--t1)",
+                  background: "var(--bg-sidebar)",
+                  border: "1px solid var(--border)",
+                  borderRadius: "9999px",
+                  padding: "4px 12px",
+                  fontSize: "12px",
+                  fontWeight: 500,
+                  color: "var(--t2)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  cursor: "pointer",
                 }}
+                onClick={() => openSettings("apikeys")}
               >
-                OmniChat
-              </span>
+                <span>Free plan</span>
+                <span style={{ color: "var(--t4)" }}>•</span>
+                <span style={{ color: "var(--accent)", textDecoration: "underline" }}>Upgrade</span>
+              </div>
 
               <button
-                onClick={() => {
-                  setActiveSessionId(null);
-                  setCompareOpen(false);
-                }}
-                aria-label="New chat"
+                onClick={() => openSettings("apikeys")}
+                aria-label="Profile Settings"
                 style={{
                   background: "none",
                   border: "none",
@@ -600,12 +605,16 @@ export default function AppShell() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  borderRadius: 6,
+                  borderRadius: "50%",
+                  width: 32,
+                  height: 32,
                 }}
               >
                 <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <path d="M18 9v3c0 3-3 6-6 6s-6-3-6-6V9a6 6 0 0 1 12 0Z" />
+                  <path d="M9 10a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" fill="currentColor" />
+                  <path d="M15 10a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" fill="currentColor" />
+                  <path d="M12 12a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1Z" />
                 </svg>
               </button>
             </div>

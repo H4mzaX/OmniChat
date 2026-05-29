@@ -208,6 +208,7 @@ export default function Composer({
   selectedModelId,
   onModelSelect,
   hasMessages = false,
+  isMobile = false,
 }) {
   const [text, setText] = useState("");
   const [plusOpen, setPlusOpen] = useState(false);
@@ -401,7 +402,7 @@ export default function Composer({
         width: "100%",
         maxWidth: 820,
         margin: "0 auto",
-        padding: "0 20px",
+        padding: isMobile ? "0 10px" : "0 20px",
         boxSizing: "border-box",
         position: "relative",
       }}
@@ -433,14 +434,14 @@ export default function Composer({
           position: "relative",
           background: "var(--bg-card)",
           border: "1px solid var(--border-md)",
-          borderRadius: 26,
+          borderRadius: isMobile ? 22 : 26,
           boxShadow: "0 8px 30px rgba(0,0,0,0.03), 0 0 0 1px var(--border)",
           transition: "border-color 150ms, box-shadow 150ms",
         }}
       >
         {/* ── File attachments inside composer (Claude.ai style) ── */}
         {files.length > 0 && (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, padding: "24px 24px 0" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, padding: isMobile ? "16px 16px 0" : "24px 24px 0" }}>
             {files.map((f, i) => {
               const fileName = f.file?.name || f.name || f.id || "";
               const ext = fileName.split(".").pop()?.toUpperCase() || "FILE";
@@ -617,7 +618,7 @@ export default function Composer({
           style={{
             display: "block",
             width: "100%",
-            padding: "28px 28px 12px",
+            padding: isMobile ? "18px 20px 8px" : "28px 28px 12px",
             border: "none",
             outline: "none",
             resize: "none",
@@ -637,7 +638,7 @@ export default function Composer({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "8px 16px 14px",
+            padding: isMobile ? "6px 12px 10px" : "8px 16px 14px",
           }}
         >
           {/* Left: Plus button only */}

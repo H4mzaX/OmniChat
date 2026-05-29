@@ -617,21 +617,37 @@ export default function CompareView() {
         {loading && (
           <div style={{ textAlign: "center", padding: "32px 0" }}>
             <div
-              style={{ display: "inline-flex", alignItems: "center", gap: 4 }}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                fontSize: 13.5,
+                color: "var(--color-text-secondary)",
+                fontWeight: 500,
+                marginBottom: 8,
+              }}
             >
-              {[0, 160, 320].map((d) => (
-                <span
-                  key={d}
-                  className="oc-dot"
-                  style={{ animationDelay: d + "ms" }}
-                />
-              ))}
+              <svg
+                width={14}
+                height={14}
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                style={{
+                  animation: "spin 1.8s linear infinite",
+                  flexShrink: 0,
+                }}
+              >
+                <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" />
+                <path d="M12 6C8.69 6 6 8.69 6 12C6 15.31 8.69 18 12 18C15.31 18 18 15.31 18 12" stroke="var(--accent)" strokeWidth="1.5" strokeDasharray="3 3" />
+                <path d="M12 8L13.5 10.5L16 12L13.5 13.5L12 16L10.5 13.5L8 12L10.5 10.5L12 8Z" fill="var(--accent)" />
+              </svg>
+              <span>Working</span>
             </div>
             <div
               style={{
                 fontSize: 12,
                 color: "var(--color-text-inverse)",
-                marginTop: 8,
               }}
             >
               Running {selectedModels.length} models in parallel...

@@ -6,6 +6,26 @@ const BOMB_THRESHOLD = 500 * 1024 * 1024;
 const MAX_FILES = limits.MAX_EXTRACTED_FILES;
 const MAX_DEPTH = limits.MAX_RECURSIVE_DEPTH;
 
+const TEXT_GROUPS = new Set(["code", "document", "spreadsheet"]);
+const MAX_TEXT_PER_FILE = 60000;
+
+// Heuristic: treat as text if the leading bytes have no NUL and few control chars.
+function looksLikeText(buf) {
+  const n = Math.min(buf.length, 4096);
+  if (n === 0) return true;
+  let weird = 0;
+  for (let i = 0; i < n; i++) {
+    const c = buf[i];
+    if (c === 0) return false;
+    if (c < 9 || (c > 13 && c < 32)) weird++;
+  }
+  return weird / n < 0.1;
+}
+
+function decodeText(buf) {
+  return buf.subarray(0, MAX_TEXT_PER_FILE * 4).toString("utf-8").slice(0, MAX_TEXT_PER_FILE);
+}
+
 export async function extractZip(buffer, name) {
   const safe = validateArchive(name, buffer);
   if (!safe.valid) return { error: safe.error };
@@ -29,19 +49,55 @@ export async function extractZip(buffer, name) {
     try {
       const content = entry.getData();
       const fileCheck = validateFile(entry.entryName, content);
+      const group = fileCheck.group || "unknown";
+      const isText = TEXT_GROUPS.has(group) || looksLikeText(content);
+      const fullText = isText ? decodeText(content) : null;
       files.push({
         path: entry.entryName,
         size: content.length,
-        type: fileCheck.group || "unknown",
+        type: group,
         mime: fileCheck.mime || "application/octet-stream",
-        preview: content.length < 100000 ? content.toString("utf-8").slice(0, 5000) : null,
+        isText,
+        text: fullText,
+        preview: fullText ? fullText.slice(0, 5000) : null,
       });
     } catch {
       files.push({ path: entry.entryName, size: 0, type: "unknown", error: "Failed to extract" });
     }
   }
 
-  return { files, total: files.length, format: "zip" };
+  return { files, total: files.length, format: "zip", text: buildArchiveText(name, files) };
+}
+
+// Synthesize a single text payload the model can read: a tree manifest followed
+// by the full source of each text file. Binary entries are listed but not inlined.
+function buildArchiveText(name, files) {
+  const manifest = files
+    .map((f) => `  ${f.path}${f.error ? " (extract failed)" : ` — ${f.size} B, ${f.type}`}`)
+    .join("\n");
+
+  const textFiles = files.filter((f) => f.text && f.text.trim());
+  let budget = 240000; // overall cap so a huge repo can't blow up the prompt
+  const bodies = [];
+  for (const f of textFiles) {
+    if (budget <= 0) {
+      bodies.push(`\n... [${textFiles.length - bodies.length} more file(s) omitted to fit context] ...`);
+      break;
+    }
+    const slice = f.text.slice(0, Math.min(f.text.length, budget));
+    budget -= slice.length;
+    bodies.push(`\n----- ${f.path} -----\n${slice}`);
+  }
+
+  const binaryCount = files.length - textFiles.length;
+  const header =
+    `Archive: ${name}\n` +
+    `Contents (${files.length} file${files.length === 1 ? "" : "s"}` +
+    `${binaryCount ? `, ${binaryCount} binary/non-text` : ""}):\n${manifest}`;
+
+  return textFiles.length
+    ? `${header}\n\n===== FILE CONTENTS =====${bodies.join("\n")}`
+    : `${header}\n\n(No text-readable files found in this archive.)`;
 }
 
 export async function extractTar(buffer, name) {

@@ -149,6 +149,30 @@ export default function ArtifactPanel({ artifact, onClose }) {
 
   const canPreview = meta.preview;
 
+  // Download code as file
+  const downloadCode = useCallback(() => {
+    const ext = artifact?.type || "txt";
+    const filename = `artifact.${ext}`;
+    const blob = new Blob([code], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [code, artifact?.type]);
+
+  // Copy code to clipboard
+  const copyCode = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+    } catch (e) {
+      console.error("Copy failed:", e);
+    }
+  }, [code]);
+
   const panelStyle = fullscreen
     ? { position: "fixed", inset: 0, zIndex: 300, display: "flex", flexDirection: "column", background: "var(--bg-card)" }
     : { width: "50%", flexShrink: 0, display: "flex", flexDirection: "column", background: "var(--bg-card)", minWidth: 320, borderLeft: "1px solid var(--border)" };
@@ -162,6 +186,21 @@ export default function ArtifactPanel({ artifact, onClose }) {
           <span style={{ fontSize: 12, fontWeight: 600, color: "var(--t1)" }}>{meta.label}</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <HeaderBtn onClick={copyCode} title="Copy code">
+            <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+            </svg>
+            <span style={{ fontSize: 11 }}>Copy</span>
+          </HeaderBtn>
+          <HeaderBtn onClick={downloadCode} title="Download file">
+            <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            <span style={{ fontSize: 11 }}>Download</span>
+          </HeaderBtn>
           {canPreview && (
             <HeaderBtn onClick={() => setShowPreview((v) => !v)} title={showPreview ? "Source" : "Preview"}>
               <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>

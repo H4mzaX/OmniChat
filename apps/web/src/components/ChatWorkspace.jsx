@@ -65,8 +65,7 @@ function OmniAvatar({ size = 28 }) {
         width: size,
         height: size,
         borderRadius: "50%",
-        background: "var(--accent-light)",
-        border: "1.5px solid var(--accent)",
+        background: "var(--accent)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -75,9 +74,7 @@ function OmniAvatar({ size = 28 }) {
       }}
     >
       <svg width={Math.round(size * 0.55)} height={Math.round(size * 0.55)} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" />
-        <path d="M12 6C8.69 6 6 8.69 6 12C6 15.31 8.69 18 12 18C15.31 18 18 15.31 18 12" stroke="var(--accent)" strokeWidth="1.5" strokeDasharray="3 3" />
-        <path d="M12 8L13.5 10.5L16 12L13.5 13.5L12 16L10.5 13.5L8 12L10.5 10.5L12 8Z" fill="var(--accent)" />
+        <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="white" />
       </svg>
     </div>
   );
@@ -183,21 +180,11 @@ function ProcessNote({ fileName, isWorking }) {
             marginTop: 2,
           }}
         >
-          <svg
-            width={14}
-            height={14}
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            style={{
-              animation: "spin 1.8s linear infinite",
-              flexShrink: 0,
-            }}
-          >
-            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" />
-            <path d="M12 6C8.69 6 6 8.69 6 12C6 15.31 8.69 18 12 18C15.31 18 18 15.31 18 12" stroke="var(--accent)" strokeWidth="1.5" strokeDasharray="3 3" />
-            <path d="M12 8L13.5 10.5L16 12L13.5 13.5L12 16L10.5 13.5L8 12L10.5 10.5L12 8Z" fill="var(--accent)" />
-          </svg>
+          <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
+            <span className="oc-dot" style={{ animationDelay: "0ms" }} />
+            <span className="oc-dot" style={{ animationDelay: "200ms" }} />
+            <span className="oc-dot" style={{ animationDelay: "400ms" }} />
+          </div>
           <span style={{ color: "var(--t2)", fontWeight: 400 }}>Working</span>
         </div>
       )}
@@ -219,23 +206,13 @@ function TypingIndicator({ fileName }) {
         fontFamily: "var(--font)",
       }}
     >
-      <svg
-        width={16}
-        height={16}
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        style={{
-          animation: "spin 1.8s linear infinite",
-          flexShrink: 0,
-        }}
-      >
-        <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" />
-        <path d="M12 6C8.69 6 6 8.69 6 12C6 15.31 8.69 18 12 18C15.31 18 18 15.31 18 12" stroke="var(--accent)" strokeWidth="1.5" strokeDasharray="3 3" />
-        <path d="M12 8L13.5 10.5L16 12L13.5 13.5L12 16L10.5 13.5L8 12L10.5 10.5L12 8Z" fill="var(--accent)" />
-      </svg>
+      <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
+        <span className="oc-dot" style={{ animationDelay: "0ms" }} />
+        <span className="oc-dot" style={{ animationDelay: "200ms" }} />
+        <span className="oc-dot" style={{ animationDelay: "400ms" }} />
+      </div>
       <span>
-        {fileName ? `Reading ${fileName}...` : "Working..."}
+        {fileName ? `Reading ${fileName}...` : "Thinking..."}
       </span>
     </div>
   );
@@ -272,10 +249,18 @@ function extractReasoning(content) {
 
 /* ─── Streaming message with blinking cursor + thinking ────────── */
 function StreamingMessage({ content, modelId, thinking, fileName }) {
-  const [showReasoning, setShowReasoning] = useState(true);
+  const [showReasoning, setShowReasoning] = useState(false);
   const parsed = extractReasoning(content);
   const activeThinking = thinking || parsed.reasoning;
   const activeBody = parsed.body;
+  const thinkingRef = useRef(null);
+
+  // Auto-scroll thinking container
+  useEffect(() => {
+    if (thinkingRef.current && showReasoning) {
+      thinkingRef.current.scrollTop = thinkingRef.current.scrollHeight;
+    }
+  }, [activeThinking, showReasoning]);
 
   return (
     <div
@@ -293,10 +278,10 @@ function StreamingMessage({ content, modelId, thinking, fileName }) {
             display: "flex",
             alignItems: "center",
             gap: 6,
-            marginBottom: 2,
+            marginBottom: 4,
           }}
         >
-          <span style={{ fontSize: 12.5, fontWeight: 500, color: "var(--t2)" }}>
+          <span style={{ fontSize: 13, fontWeight: 500, color: "var(--t2)" }}>
             OmniChat
           </span>
           {modelId && (
@@ -304,7 +289,7 @@ function StreamingMessage({ content, modelId, thinking, fileName }) {
               style={{
                 fontSize: 11,
                 color: "var(--t4)",
-                background: "rgba(0,0,0,0.04)",
+                background: "var(--bg-active)",
                 borderRadius: 4,
                 padding: "1px 6px",
               }}
@@ -323,11 +308,11 @@ function StreamingMessage({ content, modelId, thinking, fileName }) {
                 alignItems: "center",
                 gap: 6,
                 fontSize: 12,
-                color: "var(--accent)",
-                background: "var(--bg-sidebar)",
-                border: "1px solid var(--border-md)",
+                color: "var(--t3)",
+                background: "transparent",
+                border: "none",
                 borderRadius: 6,
-                padding: "4px 10px",
+                padding: "4px 8px",
                 cursor: "pointer",
                 fontFamily: "var(--font)",
                 fontWeight: 500,
@@ -335,10 +320,12 @@ function StreamingMessage({ content, modelId, thinking, fileName }) {
                 outline: "none",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "var(--accent)";
+                e.currentTarget.style.color = "var(--accent)";
+                e.currentTarget.style.background = "var(--bg-hover)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "var(--border-md)";
+                e.currentTarget.style.color = "var(--t3)";
+                e.currentTarget.style.background = "transparent";
               }}
             >
               <svg
@@ -355,21 +342,38 @@ function StreamingMessage({ content, modelId, thinking, fileName }) {
               >
                 <polyline points="9 18 15 12 9 6" />
               </svg>
-              <span>{activeBody ? "Thought Process" : "Thinking..."}</span>
+              <span style={{ fontStyle: "italic" }}>
+                {!activeBody ? "Thinking..." : showReasoning ? "Thought process" : "Thought process"}
+              </span>
+              {showReasoning && (
+                <span style={{ 
+                  fontSize: 11, 
+                  color: "var(--t4)", 
+                  fontStyle: "normal",
+                  marginLeft: 4 
+                }}>
+                  (click to hide)
+                </span>
+              )}
             </button>
             {showReasoning && (
               <div
+                ref={thinkingRef}
+                className="oc-thinking-scroll"
                 style={{
-                  background: "var(--bg-sidebar)",
-                  border: "1px solid var(--border)",
-                  borderRadius: 8,
-                  padding: "10px 14px",
                   marginTop: 6,
+                  padding: "12px 16px",
+                  background: "var(--bg-sidebar)",
+                  borderLeft: "2px solid var(--accent)",
+                  borderRadius: "0 8px 8px 0",
                   fontSize: 13,
                   color: "var(--t3)",
                   fontStyle: "italic",
-                  lineHeight: 1.55,
+                  lineHeight: 1.6,
                   whiteSpace: "pre-wrap",
+                  maxHeight: 240,
+                  overflowY: "auto",
+                  animation: "oc-fadein 150ms ease",
                 }}
               >
                 {activeThinking}
@@ -467,17 +471,15 @@ function WelcomeState({ greetingText, composer, onSendSuggestion, isMobile }) {
         }}
       >
         <svg width={36} height={36} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
-          <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" />
-          <path d="M12 6C8.69 6 6 8.69 6 12C6 15.31 8.69 18 12 18C15.31 18 18 15.31 18 12" stroke="var(--accent)" strokeWidth="1.5" strokeDasharray="3 3" />
-          <path d="M12 8L13.5 10.5L16 12L13.5 13.5L12 16L10.5 13.5L8 12L10.5 10.5L12 8Z" fill="var(--accent)" />
+          <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="var(--accent)" />
         </svg>
         <h1
           style={{
-            fontSize: isMobile ? 26 : 34,
-            fontWeight: 400,
+            fontSize: isMobile ? 24 : 30,
+            fontWeight: 500,
             fontFamily: "var(--font-serif)",
             color: "var(--t1)",
-            letterSpacing: "-0.03em",
+            letterSpacing: "-0.02em",
             lineHeight: 1.2,
             margin: 0,
             textAlign: "center",
@@ -518,23 +520,19 @@ function WelcomeState({ greetingText, composer, onSendSuggestion, isMobile }) {
               animation: "oc-card-in 300ms var(--ease) " + (i * 60) + "ms both",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-3px)";
-              e.currentTarget.style.borderColor = "var(--accent)";
+              e.currentTarget.style.transform = "translateY(-2px)";
               e.currentTarget.style.boxShadow = "var(--sh-md)";
-              e.currentTarget.style.background = "var(--bg-hover)";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.borderColor = "var(--border)";
               e.currentTarget.style.boxShadow = "var(--sh-xs)";
-              e.currentTarget.style.background = "";
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <div
                 style={{
-                  width: 30,
-                  height: 30,
+                  width: 32,
+                  height: 32,
                   borderRadius: 8,
                   background: "var(--accent-light)",
                   display: "flex",
@@ -546,11 +544,11 @@ function WelcomeState({ greetingText, composer, onSendSuggestion, isMobile }) {
               >
                 {s.icon}
               </div>
-              <span style={{ fontSize: 13.5, fontWeight: 600, color: "var(--t1)" }}>
+              <span style={{ fontSize: 14, fontWeight: 500, color: "var(--t1)" }}>
                 {s.title}
               </span>
             </div>
-            <p style={{ fontSize: 12, color: "var(--t3)", lineHeight: 1.4, margin: 0 }}>
+            <p style={{ fontSize: 12.5, color: "var(--t3)", lineHeight: 1.4, margin: 0 }}>
               {s.desc}
             </p>
           </div>
@@ -579,24 +577,24 @@ function ErrorBar({ msg, onClear, onOpenSettings }) {
         zIndex: 999,
         maxWidth: 480,
         width: "90%",
-        background: "#fff",
-        border: "1px solid rgba(192,57,43,0.25)",
+        background: "var(--bg-card)",
+        border: "1px solid var(--border-md)",
         borderRadius: 12,
-        boxShadow: "0 8px 32px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04)",
+        boxShadow: "var(--sh-lg)",
         display: "flex",
         flexDirection: "column",
         animation: "oc-slideup 200ms var(--ease)",
       }}
     >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 10,
-          padding: "12px 14px",
-          borderBottom: isLong ? "1px solid rgba(0,0,0,0.06)" : "none",
-        }}
-      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            padding: "12px 14px",
+            borderBottom: isLong ? "1px solid var(--border)" : "none",
+          }}
+        >
         <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="var(--danger)" strokeWidth={2} strokeLinecap="round" style={{ flexShrink: 0 }}>
           <circle cx="12" cy="12" r="10" />
           <line x1="12" y1="8" x2="12" y2="12" />
@@ -613,8 +611,8 @@ function ErrorBar({ msg, onClear, onOpenSettings }) {
             }}
             style={{
               padding: "4px 10px",
-              background: "rgba(204,120,92,0.10)",
-              border: "1px solid rgba(204,120,92,0.25)",
+              background: "var(--accent-light)",
+              border: "1px solid var(--accent)",
               borderRadius: 6,
               color: "var(--accent)",
               fontSize: 11.5,
@@ -625,8 +623,8 @@ function ErrorBar({ msg, onClear, onOpenSettings }) {
               fontFamily: "var(--font)",
               transition: "background 100ms",
             }}
-            onMouseEnter={(e) => e.currentTarget.style.background = "rgba(204,120,92,0.15)"}
-            onMouseLeave={(e) => e.currentTarget.style.background = "rgba(204,120,92,0.10)"}
+            onMouseEnter={(e) => e.currentTarget.style.background = "var(--accent-hover)"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "var(--accent-light)"}
           >
             Configure
           </button>
@@ -692,6 +690,8 @@ export default function ChatWorkspace({
   const [lastSentFileName, setLastSentFileName] = useState(null);
   const abortRef = useRef(null);
   const bottomRef = useRef(null);
+  const streamTextRef = useRef("");
+  const streamThinkingRef = useRef("");
   const qc = useQueryClient();
 
   const { data } = useQuery({
@@ -706,9 +706,16 @@ export default function ChatWorkspace({
   });
   const messages = data?.messages || [];
 
+  // Scroll to bottom on new messages or during streaming
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages.length, streamText]);
+    if (isStreaming) {
+      // During streaming, scroll immediately
+      bottomRef.current?.scrollIntoView({ behavior: "auto" });
+    } else {
+      // After streaming, use smooth scroll
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages.length, streamText, isStreaming]);
 
   const handleSend = useCallback(
     async (input) => {
@@ -788,8 +795,46 @@ export default function ChatWorkspace({
       setIsStreaming(true);
       setStreamText("");
       setStreamThinking("");
+      streamTextRef.current = "";
+      streamThinkingRef.current = "";
       const ctrl = new AbortController();
       abortRef.current = ctrl;
+
+      // Smooth streaming: accumulate tokens and flush periodically
+      let rafId = null;
+      let pendingText = "";
+      let pendingThinking = "";
+      let lastFlushTime = 0;
+      const FLUSH_INTERVAL = 16; // ~60fps
+
+      const flushPending = () => {
+        rafId = null;
+        const now = Date.now();
+        if (pendingText !== streamTextRef.current) {
+          streamTextRef.current = pendingText;
+          setStreamText(pendingText);
+        }
+        if (pendingThinking !== streamThinkingRef.current) {
+          streamThinkingRef.current = pendingThinking;
+          setStreamThinking(pendingThinking);
+        }
+        lastFlushTime = now;
+      };
+
+      const scheduleUpdate = () => {
+        const now = Date.now();
+        // If enough time has passed since last flush, flush immediately on next frame
+        if (now - lastFlushTime >= FLUSH_INTERVAL) {
+          if (rafId) cancelAnimationFrame(rafId);
+          rafId = requestAnimationFrame(flushPending);
+        } else if (!rafId) {
+          // Otherwise, schedule a flush for when the interval expires
+          const delay = FLUSH_INTERVAL - (now - lastFlushTime);
+          rafId = setTimeout(() => {
+            rafId = requestAnimationFrame(flushPending);
+          }, delay);
+        }
+      };
 
       try {
         const res = await fetch("/api/chat/stream", {
@@ -847,17 +892,35 @@ export default function ChatWorkspace({
             }
             if (ev.token) {
               acc += ev.token;
-              setStreamText(acc);
+              pendingText = acc;
+              scheduleUpdate();
             }
             if (ev.thinking) {
-              setStreamThinking(ev.thinking);
+              pendingThinking = ev.thinking;
+              scheduleUpdate();
             }
             if (ev.done) {
+              // Final immediate flush
+              if (rafId) {
+                clearTimeout(rafId);
+                cancelAnimationFrame(rafId);
+              }
+              rafId = null;
+              streamTextRef.current = acc;
+              setStreamText(acc);
+              if (pendingThinking) {
+                streamThinkingRef.current = pendingThinking;
+                setStreamThinking(pendingThinking);
+              }
+
               const art = detectArtifact(acc);
               if (art) {
                 setArtifact(art);
                 setArtifactOpen(true);
               }
+
+              // Wait for DB persist then invalidate
+              await new Promise(r => setTimeout(r, 50));
               await qc.invalidateQueries({ queryKey: ["messages", sid] });
               await qc.invalidateQueries({ queryKey: ["sessions"] });
             }
@@ -868,9 +931,15 @@ export default function ChatWorkspace({
           setStreamError(err.message);
         }
       } finally {
+        if (rafId) {
+          clearTimeout(rafId);
+          cancelAnimationFrame(rafId);
+        }
         setIsStreaming(false);
         setStreamText("");
         setStreamThinking("");
+        streamTextRef.current = "";
+        streamThinkingRef.current = "";
         abortRef.current = null;
       }
     },
@@ -934,9 +1003,10 @@ export default function ChatWorkspace({
               greetingText={
                 (() => {
                   const hr = new Date().getHours();
-                  if (hr >= 0 && hr < 7) return "Moonlit chat?";
-                  if (hr >= 7 && hr < 16) return "Coffee and OmniChat time?";
-                  return "What can I help you build today?";
+                  if (hr >= 0 && hr < 7) return "Good evening";
+                  if (hr >= 7 && hr < 12) return "Good morning";
+                  if (hr >= 12 && hr < 18) return "Good afternoon";
+                  return "Good evening";
                 })()
               }
               composer={composer}
@@ -957,10 +1027,11 @@ export default function ChatWorkspace({
                   borderBottom: "1px solid var(--border)",
                   flexShrink: 0,
                   position: "relative",
+                  background: "var(--bg)",
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <OmniAvatar size={22} />
+                  <OmniAvatar size={20} />
                   <span
                     style={{ fontSize: 14, fontWeight: 500, color: "var(--t1)" }}
                   >
@@ -986,7 +1057,7 @@ export default function ChatWorkspace({
                       style={{
                         width: 28,
                         height: 28,
-                        borderRadius: 8,
+                        borderRadius: 6,
                         border: "none",
                         background: "transparent",
                         cursor: "pointer",
@@ -995,14 +1066,16 @@ export default function ChatWorkspace({
                         justifyContent: "center",
                         fontSize: 14,
                         color: "var(--t3)",
-                        transition: "background 80ms",
+                        transition: "background 80ms, color 80ms",
                       }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.background = "rgba(0,0,0,0.06)")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.background = "transparent")
-                      }
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = "var(--bg-hover)";
+                        e.currentTarget.style.color = "var(--t2)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = "transparent";
+                        e.currentTarget.style.color = "var(--t3)";
+                      }}
                     >
                       {btn.icon}
                     </button>
@@ -1017,7 +1090,7 @@ export default function ChatWorkspace({
                 style={{
                   maxWidth: 800,
                   margin: "0 auto",
-                  paddingTop: 16,
+                  paddingTop: 20,
                   paddingBottom: 8,
                   paddingLeft: 8,
                   paddingRight: 8,
@@ -1074,7 +1147,7 @@ export default function ChatWorkspace({
 
             <div
               style={{
-                padding: "0 24px 32px",
+                padding: "0 24px 24px",
                 flexShrink: 0,
                 background: "transparent",
                 position: "relative",

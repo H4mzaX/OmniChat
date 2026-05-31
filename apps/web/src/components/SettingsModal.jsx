@@ -260,8 +260,27 @@ function InfoBox({ children, color = S.info }) {
 
 /* ── Profile ── */
 function ProfileTab() {
-  const [name, setName] = useState("User");
-  const [email, setEmail] = useState("user@example.com");
+  const [name, setName] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("omnichat-user-name") || "User";
+    }
+    return "User";
+  });
+  const [email, setEmail] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("omnichat-user-email") || "user@example.com";
+    }
+    return "user@example.com";
+  });
+  const [saved, setSaved] = useState(false);
+
+  const handleSave = () => {
+    localStorage.setItem("omnichat-user-name", name);
+    localStorage.setItem("omnichat-user-email", email);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
   return (
     <div>
       <div
@@ -324,8 +343,13 @@ function ProfileTab() {
           />
         }
       />
-      <div style={{ marginTop: 16 }}>
-        <Btn>Save changes</Btn>
+      <div style={{ marginTop: 16, display: "flex", gap: 8, alignItems: "center" }}>
+        <Btn onClick={handleSave}>Save changes</Btn>
+        {saved && (
+          <span style={{ fontSize: 12, color: S.success, animation: "oc-fadein 200ms ease" }}>
+            Saved!
+          </span>
+        )}
       </div>
     </div>
   );
@@ -428,13 +452,25 @@ function AppearanceTab({ theme, setTheme, density, setDensity, fontSize, setFont
 
 /* ── Privacy ── */
 function PrivacyTab() {
-  const [settings, setSettings] = useState({
-    shareConversations: false,
-    analytics: true,
-    improvements: true,
-    notifications: false,
+  const [settings, setSettings] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("omnichat-privacy-settings");
+      if (saved) {
+        try { return JSON.parse(saved); } catch {}
+      }
+    }
+    return {
+      shareConversations: false,
+      analytics: true,
+      improvements: true,
+      notifications: false,
+    };
   });
-  const upd = (k, v) => setSettings((s) => ({ ...s, [k]: v }));
+  const upd = (k, v) => {
+    const newSettings = { ...settings, [k]: v };
+    setSettings(newSettings);
+    localStorage.setItem("omnichat-privacy-settings", JSON.stringify(newSettings));
+  };
   return (
     <div>
       <InfoBox color={S.info}>
@@ -497,6 +533,18 @@ function PrivacyTab() {
           </div>
         </div>
         <button
+          onClick={async () => {
+            if (confirm("Are you sure you want to delete all conversations? This cannot be undone.")) {
+              try {
+                const r = await fetch("/api/chat/sessions", { method: "DELETE" });
+                if (r.ok) {
+                  window.location.reload();
+                }
+              } catch (e) {
+                console.error("Failed to delete:", e);
+              }
+            }
+          }}
           style={{
             padding: "7px 14px",
             borderRadius: 8,
@@ -518,14 +566,39 @@ function PrivacyTab() {
 
 /* ── Assistant ── */
 function AssistantTab() {
-  const [settings, setSettings] = useState({
-    memoryEnabled: true,
-    artifacts: true,
-    latex: true,
-    citations: false,
-    autoTitle: true,
+  const [settings, setSettings] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("omnichat-assistant-settings");
+      if (saved) {
+        try { return JSON.parse(saved); } catch {}
+      }
+    }
+    return {
+      memoryEnabled: true,
+      artifacts: true,
+      latex: true,
+      citations: false,
+      autoTitle: true,
+    };
   });
-  const upd = (k, v) => setSettings((s) => ({ ...s, [k]: v }));
+  const [systemPrompt, setSystemPrompt] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("omnichat-system-prompt") || "";
+    }
+    return "";
+  });
+  const [saved, setSaved] = useState(false);
+  const upd = (k, v) => {
+    const newSettings = { ...settings, [k]: v };
+    setSettings(newSettings);
+    localStorage.setItem("omnichat-assistant-settings", JSON.stringify(newSettings));
+  };
+
+  const handleSavePrompt = () => {
+    localStorage.setItem("omnichat-system-prompt", systemPrompt);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
 
   return (
     <div>
@@ -588,6 +661,8 @@ function AssistantTab() {
         Custom instructions added to every conversation
       </div>
       <textarea
+        value={systemPrompt}
+        onChange={(e) => setSystemPrompt(e.target.value)}
         placeholder="You are a helpful assistant..."
         style={{
           width: "100%",
@@ -603,8 +678,13 @@ function AssistantTab() {
           outline: "none",
         }}
       />
-      <div style={{ marginTop: 10 }}>
-        <Btn size="sm">Save instructions</Btn>
+      <div style={{ marginTop: 10, display: "flex", gap: 8, alignItems: "center" }}>
+        <Btn size="sm" onClick={handleSavePrompt}>Save instructions</Btn>
+        {saved && (
+          <span style={{ fontSize: 12, color: S.success, animation: "oc-fadein 200ms ease" }}>
+            Saved!
+          </span>
+        )}
       </div>
     </div>
   );

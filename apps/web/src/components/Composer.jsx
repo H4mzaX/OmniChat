@@ -434,8 +434,8 @@ export default function Composer({
           position: "relative",
           background: "var(--bg-card)",
           border: "1px solid var(--border-md)",
-          borderRadius: isMobile ? 22 : 26,
-          boxShadow: "0 8px 30px rgba(0,0,0,0.03), 0 0 0 1px var(--border)",
+          borderRadius: isMobile ? 22 : 24,
+          boxShadow: "0 2px 8px rgba(0,0,0,0.03), 0 0 0 1px var(--border)",
           transition: "border-color 150ms, box-shadow 150ms",
         }}
       >
@@ -618,7 +618,7 @@ export default function Composer({
           style={{
             display: "block",
             width: "100%",
-            padding: isMobile ? "18px 20px 8px" : "28px 28px 12px",
+            padding: isMobile ? "16px 20px 8px" : "20px 24px 12px",
             border: "none",
             outline: "none",
             resize: "none",
@@ -627,7 +627,7 @@ export default function Composer({
             fontSize: 16,
             lineHeight: 1.55,
             color: "var(--t1)",
-            minHeight: 56,
+            minHeight: 52,
             maxHeight: 240,
           }}
         />
@@ -638,7 +638,7 @@ export default function Composer({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: isMobile ? "6px 12px 10px" : "8px 16px 14px",
+            padding: isMobile ? "6px 12px 10px" : "6px 14px 12px",
           }}
         >
           {/* Left: Plus button only */}
@@ -726,18 +726,24 @@ export default function Composer({
                   width: 32,
                   height: 32,
                   borderRadius: "50%",
-                  border: "none",
-                  background: "var(--send-bg)",
+                  border: "1px solid var(--border-md)",
+                  background: "var(--bg-card)",
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: "var(--bg-card)",
+                  color: "var(--t2)",
                   flexShrink: 0,
-                  transition: "background 120ms",
+                  transition: "background 120ms, border-color 120ms",
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.background = "var(--send-hov)"}
-                onMouseLeave={(e) => e.currentTarget.style.background = "var(--send-bg)"}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "var(--bg-hover)";
+                  e.currentTarget.style.borderColor = "var(--accent)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "var(--bg-card)";
+                  e.currentTarget.style.borderColor = "var(--border-md)";
+                }}
               >
                 <StopIcon size={12} />
               </button>
@@ -904,7 +910,7 @@ function CategoryPill({ label, icon: IconCmp, onClick }) {
         display: "inline-flex",
         alignItems: "center",
         gap: 6,
-        padding: "6px 14px",
+        padding: "7px 14px",
         border: "1px solid var(--border)",
         borderRadius: 999,
         background: hov ? "var(--bg-hover)" : "transparent",
@@ -912,7 +918,7 @@ function CategoryPill({ label, icon: IconCmp, onClick }) {
         fontFamily: "var(--font)",
         fontSize: 13,
         color: hov ? "var(--t1)" : "var(--t3)",
-        transition: "background 60ms, color 60ms",
+        transition: "background 60ms, color 60ms, border-color 60ms",
         whiteSpace: "nowrap",
       }}
     >

@@ -137,20 +137,11 @@ function ProcessNote({ fileName, isWorking }) {
             marginTop: 2,
           }}
         >
-          <svg
-            width={14}
-            height={14}
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            style={{
-              animation: "spin 1.8s linear infinite",
-            }}
-          >
-            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" />
-            <path d="M12 6C8.69 6 6 8.69 6 12C6 15.31 8.69 18 12 18C15.31 18 18 15.31 18 12" stroke="var(--accent)" strokeWidth="1.5" strokeDasharray="3 3" />
-            <path d="M12 8L13.5 10.5L16 12L13.5 13.5L12 16L10.5 13.5L8 12L10.5 10.5L12 8Z" fill="var(--accent)" />
-          </svg>
+          <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
+            <span className="oc-dot" style={{ animationDelay: "0ms" }} />
+            <span className="oc-dot" style={{ animationDelay: "200ms" }} />
+            <span className="oc-dot" style={{ animationDelay: "400ms" }} />
+          </div>
           <span style={{ color: "var(--t2)", fontWeight: 400 }}>Working</span>
         </div>
       )}
@@ -174,10 +165,23 @@ function CodeBlock({ children, className }) {
     } catch (_) {}
   };
 
+  const download = () => {
+    const ext = lang === "javascript" ? "js" : lang === "typescript" ? "ts" : lang === "jsx" ? "jsx" : lang === "tsx" ? "tsx" : lang;
+    const blob = new Blob([code], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `code.${ext}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div
       style={{
-        borderRadius: 8,
+        borderRadius: 10,
         border: "1px solid var(--border-md)",
         overflow: "hidden",
         margin: "14px 0",
@@ -189,8 +193,8 @@ function CodeBlock({ children, className }) {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "6px 14px",
-          background: "var(--bg-card)",
+          padding: "8px 14px",
+          background: "var(--bg-sidebar)",
           borderBottom: "1px solid var(--border)",
         }}
       >
@@ -225,6 +229,27 @@ function CodeBlock({ children, className }) {
             </button>
           )}
           <button
+            onClick={download}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 5,
+              fontSize: 12,
+              color: "var(--t3)",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              fontFamily: "var(--font)",
+              transition: "color 100ms",
+            }}
+          >
+            <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+          </button>
+          <button
             onClick={copy}
             style={{
               display: "inline-flex",
@@ -248,7 +273,7 @@ function CodeBlock({ children, className }) {
         style={{
           overflowX: "auto",
           padding: "14px 16px",
-          background: "var(--bg-sidebar)",
+          background: "var(--bg-card)",
           margin: 0,
         }}
       >
@@ -281,6 +306,38 @@ function FileBlock({ file }) {
   const ext = file.ext || fileName.split(".").pop()?.toUpperCase() || "FILE";
   const sizeKb = file.size ? `${(file.size / 1024).toFixed(1)} KB` : "";
 
+  const downloadFile = () => {
+    if (file.text) {
+      // Text file - download as text
+      const blob = new Blob([file.text], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } else if (file.base64) {
+      // Binary file - download from base64
+      const byteCharacters = atob(file.base64);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: file.type || "application/octet-stream" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  };
+
   return (
     <div
       style={{
@@ -288,7 +345,7 @@ function FileBlock({ file }) {
         alignItems: "center",
         gap: 12,
         padding: "10px 14px",
-        background: "var(--bg-active)",
+        background: "var(--bg-sidebar)",
         border: "1px solid var(--border)",
         borderRadius: 10,
         margin: "6px 0",
@@ -300,8 +357,8 @@ function FileBlock({ file }) {
         style={{
           width: 32,
           height: 32,
-          borderRadius: 6,
-          background: "rgba(204,120,92,0.08)",
+          borderRadius: 8,
+          background: "var(--accent-light)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -311,7 +368,7 @@ function FileBlock({ file }) {
       >
         <FileIcon size={16} />
       </div>
-      <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
+      <div style={{ display: "flex", flexDirection: "column", minWidth: 0, flex: 1 }}>
         <span
           style={{
             fontSize: 12.5,
@@ -332,6 +389,38 @@ function FileBlock({ file }) {
           {sizeKb && <span>{sizeKb}</span>}
         </span>
       </div>
+      <button
+        onClick={downloadFile}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 28,
+          height: 28,
+          borderRadius: 6,
+          border: "none",
+          background: "transparent",
+          color: "var(--t3)",
+          cursor: "pointer",
+          flexShrink: 0,
+          transition: "background 60ms, color 60ms",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "var(--bg-hover)";
+          e.currentTarget.style.color = "var(--accent)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "transparent";
+          e.currentTarget.style.color = "var(--t3)";
+        }}
+        title="Download file"
+      >
+        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+      </button>
     </div>
   );
 }
@@ -372,9 +461,9 @@ function ImageBlock({ src }) {
         src={src}
         onClick={() => setExpanded((v) => !v)}
         style={{
-          maxWidth: expanded ? "100%" : 240,
-          maxHeight: expanded ? 600 : 240,
-          borderRadius: 8,
+          maxWidth: expanded ? "100%" : 280,
+          maxHeight: expanded ? 600 : 280,
+          borderRadius: 10,
           cursor: "pointer",
           border: "1px solid var(--border)",
           objectFit: expanded ? "contain" : "cover",
@@ -421,8 +510,7 @@ function OmniAvatar() {
         height: size,
         borderRadius: "50%",
         flexShrink: 0,
-        background: "var(--accent-light)",
-        border: "1.5px solid var(--accent)",
+        background: "var(--accent)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -430,9 +518,7 @@ function OmniAvatar() {
       }}
     >
       <svg width={Math.round(size * 0.55)} height={Math.round(size * 0.55)} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" />
-        <path d="M12 6C8.69 6 6 8.69 6 12C6 15.31 8.69 18 12 18C15.31 18 18 15.31 18 12" stroke="var(--accent)" strokeWidth="1.5" strokeDasharray="3 3" />
-        <path d="M12 8L13.5 10.5L16 12L13.5 13.5L12 16L10.5 13.5L8 12L10.5 10.5L12 8Z" fill="var(--accent)" />
+        <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="white" />
       </svg>
     </div>
   );
@@ -481,8 +567,8 @@ function Chip({ label, value }) {
         gap: 4,
         fontSize: 11,
         color: "var(--t4)",
-        background: "var(--bg-active)",
-        borderRadius: "var(--rf)",
+        background: "var(--bg-sidebar)",
+        borderRadius: 6,
         padding: "2px 8px",
       }}
     >
@@ -566,13 +652,12 @@ export default function MessageBubble({
           <div style={{ maxWidth: "75%" }}>
             <div
               style={{
-                background: "var(--bg-card)",
-                borderRadius: "14px 14px 4px 14px",
-                padding: "7px 14px",
-                fontSize: 14,
-                lineHeight: 1.5,
+                background: "var(--bg-user-bubble)",
+                borderRadius: "18px 18px 4px 18px",
+                padding: "10px 16px",
+                fontSize: 15,
+                lineHeight: 1.6,
                 color: "var(--t1)",
-                boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
                 wordBreak: "break-word",
               }}
             >
@@ -612,11 +697,11 @@ export default function MessageBubble({
                 display: "flex",
                 alignItems: "center",
                 gap: 6,
-                marginBottom: 2,
+                marginBottom: 4,
               }}
             >
               <span
-                style={{ fontSize: 12.5, fontWeight: 500, color: "var(--t2)" }}
+                style={{ fontSize: 13, fontWeight: 500, color: "var(--t2)" }}
               >
                 OmniChat
               </span>
@@ -651,22 +736,22 @@ export default function MessageBubble({
                     gap: 6,
                     fontSize: 12,
                     color: "var(--t3)",
-                    background: "var(--bg-hover)",
-                    border: "1px solid var(--border)",
+                    background: "transparent",
+                    border: "none",
                     borderRadius: 6,
-                    padding: "4px 10px",
+                    padding: "4px 8px",
                     cursor: "pointer",
                     fontFamily: "var(--font)",
                     fontWeight: 500,
                     transition: "all 120ms ease",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = "var(--accent)";
                     e.currentTarget.style.color = "var(--accent)";
+                    e.currentTarget.style.background = "var(--bg-hover)";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = "var(--border)";
                     e.currentTarget.style.color = "var(--t3)";
+                    e.currentTarget.style.background = "transparent";
                   }}
                 >
                   <svg
@@ -683,23 +768,38 @@ export default function MessageBubble({
                   >
                     <polyline points="9 18 15 12 9 6" />
                   </svg>
-                  {showReasoning ? "Hide thought process" : "View thought process"}
+                  <span style={{ fontStyle: "italic" }}>
+                    {showReasoning ? "Thought process" : "Thought process"}
+                  </span>
+                  {showReasoning && (
+                    <span style={{ 
+                      fontSize: 11, 
+                      color: "var(--t4)", 
+                      fontStyle: "normal",
+                      marginLeft: 4 
+                    }}>
+                      (click to hide)
+                    </span>
+                  )}
                 </button>
                 {showReasoning && (
                   <div
+                    className="oc-thinking-scroll"
                     style={{
-                      marginTop: 8,
+                      marginTop: 6,
                       padding: "12px 16px",
                       background: "var(--bg-sidebar)",
-                      borderLeft: "3px solid var(--accent)",
+                      borderLeft: "2px solid var(--accent)",
                       borderRadius: "0 8px 8px 0",
                       fontSize: 13,
                       color: "var(--t3)",
-                      lineHeight: 1.55,
+                      lineHeight: 1.6,
                       whiteSpace: "pre-wrap",
                       fontFamily: "var(--font-serif)",
                       fontStyle: "italic",
                       animation: "oc-slideup 200ms var(--ease)",
+                      maxHeight: 240,
+                      overflowY: "auto",
                     }}
                   >
                     {reasoning}
@@ -718,8 +818,8 @@ export default function MessageBubble({
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 1,
-                marginTop: 4,
+                gap: 2,
+                marginTop: 6,
                 opacity: hov ? 1 : 0,
                 transition: "opacity 100ms",
               }}

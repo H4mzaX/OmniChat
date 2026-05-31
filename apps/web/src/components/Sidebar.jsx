@@ -115,9 +115,7 @@ const MoonIcon = ({ size = 14 }) => (
 /* ── OmniChat Custom Brand Logo (Orbital models spark) ── */
 const BrandLogo = ({ size = 20 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
-    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" />
-    <path d="M12 6C8.69 6 6 8.69 6 12C6 15.31 8.69 18 12 18C15.31 18 18 15.31 18 12" stroke="var(--accent)" strokeWidth="1.5" strokeDasharray="3 3" />
-    <path d="M12 8L13.5 10.5L16 12L13.5 13.5L12 16L10.5 13.5L8 12L10.5 10.5L12 8Z" fill="var(--accent)" />
+    <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="var(--accent)" />
   </svg>
 );
 
@@ -160,7 +158,7 @@ function NavItem({ icon, label, badge, onClick, active, disabled, collapsed }) {
         alignItems: "center",
         gap: 10,
         width: "100%",
-        padding: collapsed ? "10px" : "8px 12px",
+        padding: collapsed ? "10px" : "8px 10px",
         justifyContent: collapsed ? "center" : "flex-start",
         background: active
           ? "var(--bg-active)"
@@ -178,7 +176,7 @@ function NavItem({ icon, label, badge, onClick, active, disabled, collapsed }) {
               ? "var(--t2)"
               : "var(--t3)",
         fontFamily: "var(--font)",
-        fontSize: 14,
+        fontSize: 13.5,
         fontWeight: active ? 500 : 400,
         transition: "background 80ms, color 80ms",
         opacity: disabled ? 0.55 : 1,
@@ -261,7 +259,7 @@ function SessionRow({ session, isActive, onClick, onDelete, onPin }) {
           alignItems: "center",
           gap: 8,
           width: "100%",
-          padding: "8px 12px",
+          padding: "8px 10px",
           background: isActive
             ? "var(--bg-active)"
             : hov
@@ -279,7 +277,7 @@ function SessionRow({ session, isActive, onClick, onDelete, onPin }) {
           <span
             style={{
               display: "block",
-              fontSize: 13.5,
+              fontSize: 13,
               fontWeight: isActive ? 500 : 400,
               color: isActive ? "var(--t1)" : "var(--t2)",
               overflow: "hidden",
@@ -407,8 +405,8 @@ function SectionHead({ label }) {
   return (
     <div
       style={{
-        padding: "14px 10px 6px",
-        fontSize: 11.5,
+        padding: "12px 10px 6px",
+        fontSize: 11,
         fontWeight: 500,
         color: "var(--t4)",
         letterSpacing: "0.01em",
@@ -473,7 +471,7 @@ export default function Sidebar({
   const sessions = data?.sessions || [];
   const pinned = sessions.filter((s) => s.is_pinned);
   const recent = sessions.filter((s) => !s.is_pinned);
-  const W = collapsed ? 72 : 300;
+  const W = collapsed ? 72 : 280;
 
   return (
     <nav
@@ -496,14 +494,14 @@ export default function Sidebar({
           display: "flex",
           alignItems: "center",
           justifyContent: collapsed ? "center" : "space-between",
-          padding: collapsed ? "16px 0" : "18px 16px 8px",
+          padding: collapsed ? "16px 0" : "16px 14px 8px",
           flexShrink: 0,
         }}
       >
         {!collapsed && (
           <span
             style={{
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: 600,
               fontFamily: "var(--font)",
               letterSpacing: "-0.02em",
@@ -538,7 +536,7 @@ export default function Sidebar({
       </div>
 
       {/* ── Nav items ── */}
-      <div style={{ padding: "2px 10px", flexShrink: 0 }}>
+      <div style={{ padding: "2px 8px", flexShrink: 0 }}>
         {/* New Chat */}
         <NavItem
           collapsed={collapsed}
@@ -603,7 +601,7 @@ export default function Sidebar({
 
       {/* ── Search box ── */}
       {showSearch && !collapsed && (
-        <div style={{ padding: "4px 12px", flexShrink: 0 }}>
+        <div style={{ padding: "4px 10px", flexShrink: 0 }}>
           <div
             style={{
               display: "flex",
@@ -659,7 +657,7 @@ export default function Sidebar({
       {!collapsed && (
       <div
         style={{
-          margin: "4px 12px",
+          margin: "4px 10px",
           borderTop: "1px solid var(--border)",
           flexShrink: 0,
         }}
@@ -668,7 +666,7 @@ export default function Sidebar({
 
       {/* ── Session list ── */}
       {!collapsed && (
-        <div style={{ flex: 1, overflowY: "auto", padding: "0 8px" }}>
+        <div style={{ flex: 1, overflowY: "auto", padding: "0 6px" }}>
           {sessions.length === 0 ? (
             <div
               style={{
@@ -718,7 +716,7 @@ export default function Sidebar({
         style={{
           borderTop: "1px solid var(--border)",
           flexShrink: 0,
-          padding: collapsed ? "10px 0" : "12px 14px",
+          padding: collapsed ? "10px 0" : "12px 12px",
           display: "flex",
           alignItems: "center",
           justifyContent: collapsed ? "center" : "space-between",
@@ -754,7 +752,7 @@ export default function Sidebar({
                   width: 32,
                   height: 32,
                   borderRadius: "50%",
-                  background: "#191919",
+                  background: "var(--accent)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -805,12 +803,12 @@ export default function Sidebar({
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = "var(--bg-hover)";
                   e.currentTarget.style.color = "var(--t1)";
-                  e.currentTarget.style.transform = "scale(1.08) rotate(15deg)";
+                  e.currentTarget.style.transform = "scale(1.08)";
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = "transparent";
                   e.currentTarget.style.color = "var(--t3)";
-                  e.currentTarget.style.transform = "scale(1) rotate(0deg)";
+                  e.currentTarget.style.transform = "scale(1)";
                 }}
               >
                 {theme === "dark" ? <SunIcon size={14} /> : <MoonIcon size={14} />}
@@ -873,11 +871,11 @@ export default function Sidebar({
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = "var(--bg-hover)";
-                e.currentTarget.style.transform = "scale(1.08) rotate(15deg)";
+                e.currentTarget.style.transform = "scale(1.08)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = "transparent";
-                e.currentTarget.style.transform = "scale(1) rotate(0deg)";
+                e.currentTarget.style.transform = "scale(1)";
               }}
             >
               {theme === "dark" ? <SunIcon size={14} /> : <MoonIcon size={14} />}

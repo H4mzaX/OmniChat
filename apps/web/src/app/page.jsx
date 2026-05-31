@@ -199,7 +199,7 @@ const GLOBAL_CSS = `
   }
 
   @keyframes oc-blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
-  @keyframes oc-dot { 0%,60%,100%{transform:translateY(0);opacity:.3} 30%{transform:translateY(-4px);opacity:1} }
+  @keyframes oc-dot { 0%,60%,100%{transform:translateY(0);opacity:.3} 30%{transform:translateY(-5px);opacity:1} }
   @keyframes oc-fadein { from{opacity:0} to{opacity:1} }
   @keyframes oc-slideup { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
   @keyframes oc-card-in { from{opacity:0;transform:scale(0.96) translateY(8px)} to{opacity:1;transform:scale(1) translateY(0)} }
@@ -216,6 +216,18 @@ const GLOBAL_CSS = `
     border-radius:50%; background:var(--t4);
     animation:oc-dot 1.4s ease-in-out infinite;
   }
+
+  /* Thinking scroll container - Claude-like compact scrollable */
+  .oc-thinking-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(20,20,19,0.15) transparent;
+  }
+  .oc-thinking-scroll::-webkit-scrollbar { width: 4px; }
+  .oc-thinking-scroll::-webkit-scrollbar-track { background: transparent; }
+  .oc-thinking-scroll::-webkit-scrollbar-thumb { background: rgba(20,20,19,0.15); border-radius: 99px; }
+  .oc-thinking-scroll::-webkit-scrollbar-thumb:hover { background: rgba(20,20,19,0.25); }
+  :root[data-theme="dark"] .oc-thinking-scroll::-webkit-scrollbar-thumb { background: rgba(240,240,235,0.15); }
+  :root[data-theme="dark"] .oc-thinking-scroll::-webkit-scrollbar-thumb:hover { background: rgba(240,240,235,0.25); }
 
   /* Form elements legibility fixes for dark mode */
   :root[data-theme="dark"] select,
